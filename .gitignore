@@ -15,3 +15,11 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# 手动设置gitignore文件，忽略maven wrapper相关文件
+**/mvnw
+**/mvnw.cmd
+**/.mvn
+**/target/
+.idea
+**/.gitignore
