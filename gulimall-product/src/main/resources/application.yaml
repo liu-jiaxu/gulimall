@@ -1,0 +1,33 @@
+# common中自定义鉴权配置
+#gulimall:
+#  shiro:
+#    enabled: true          # 开启拦截
+#    permissions: product:brand:list,product:brand:save   # 当前用户权限（逗号分隔）
+#    permission-all: true   # 开发期放行所有权限（可选）
+
+server:
+  port: 10000
+
+spring:
+  datasource:
+    username: root
+    password: zgh2960425
+    # 参数	                                    作用
+    # useUnicode=true&characterEncoding=UTF-8	防止中文乱码
+    # serverTimezone=Asia/Shanghai	            必须设置，否则报时区错误
+    # allowPublicKeyRetrieval=true	            必须设置，否则报公钥检索错误
+    url: jdbc:mysql://192.168.10.200:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # mysql8.0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  # classpath*表示自己和引入其他模块的mapper.xml都会扫描
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 全局配置
+  global-config:
+    db-config:
+      id-type: auto                    # 主键策略：自增（数据库自增）
+#      logic-delete-value: 1            # 逻辑已删除值
+#      logic-not-delete-value: 0        # 逻辑未删除值
+#      table-prefix: pms_               # 表名前缀（可选）
+#      field-strategy: not_null         # 字段策略：非空才更新
