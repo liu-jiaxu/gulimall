@@ -9,6 +9,9 @@ server:
   port: 9000
 
 spring:
+  application:
+    name: gulimall-order
+
   datasource:
     username: root
     password: zgh2960425
@@ -19,6 +22,12 @@ spring:
     url: jdbc:mysql://192.168.10.200:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     # mysql8.0
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Nacos配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.10.200:8848
 
 mybatis-plus:
   # classpath*表示自己和引入其他模块的mapper.xml都会扫描

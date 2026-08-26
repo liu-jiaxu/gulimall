@@ -1,3 +1,8 @@
+# 补充
+# 由于后期配置文件会配置很多内容，因此可以将配置文件拆分成多个配置文件放到Nacos上读取
+# 例如端口号、DB配置、框架配置、微服务配置、日志配置、权限配置等多个配置文件
+# 然后微服务启动后加载多个配置文件即可 spring.config.import=optional:nacos:gulimall.yaml
+
 # common中自定义鉴权配置
 #gulimall:
 #  shiro:
@@ -9,6 +14,9 @@ server:
   port: 7000
 
 spring:
+  application:
+    name: gulimall-coupon
+
   datasource:
     username: root
     password: zgh2960425
@@ -19,6 +27,32 @@ spring:
     url: jdbc:mysql://192.168.10.200:3306/gulimall_sms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     # mysql8.0
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Nacos配置
+  cloud:
+    nacos:
+      # 统一配置：discovery（注册中心）与 config（配置中心）共用该地址
+      config:
+        enabled: true
+        # 这是配置服务注册发现的
+        server-addr: 192.168.10.200:8848
+        # 指定命名空间（Nacos控制台 -> 配置管理 -> 命名空间），默认是public
+        # 注意：Nacos命名空间必须是ID，不要引入名称！
+        namespace: cb7e3766-18df-46b7-a6a1-c9cba6c6189a
+        # 指定配置组（Nacos控制台 -> 配置管理 -> 配置列表），默认是DEFAULT_GROUP
+        # 注意大小写！
+        group: COUPON_GROUP
+      # 这是配置中心的
+      server-addr: 192.168.10.200:8848
+      discovery:
+        enabled: true
+
+  # Nacos配置中心指定配置源
+  config:
+    import:
+      - optional:nacos:gulimall.yaml  # 指定data-id
+      # 使用通配符
+      - optional:nacos:${spring.application.name}.yaml
 
 mybatis-plus:
   # classpath*表示自己和引入其他模块的mapper.xml都会扫描
@@ -31,3 +65,11 @@ mybatis-plus:
 #      logic-not-delete-value: 0        # 逻辑未删除值
 #      table-prefix: sms_               # 表名前缀（可选）
 #      field-strategy: not_null         # 字段策略：非空才更新
+
+# 用于获取配置信息测试
+user:
+  # user.name 是 JVM 的系统属性（System.getProperty("user.name") = 当前操作系统用户名 = zgh29）。
+  # Spring 的 Environment 中，系统属性优先级高于配置文件，所以 ${user.name} 解析到的是 JVM 的 zgh29，而不是 application.yaml 里配的 nacos。
+  # 这是经典坑：user.name / user.home / user.dir 都是 JVM 保留属性，永远不要用它们做业务配置键。
+  name: nacos
+  password: 123456

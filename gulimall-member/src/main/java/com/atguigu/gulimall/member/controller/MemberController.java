@@ -3,6 +3,7 @@ package com.atguigu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimall.member.feign.CouponFeignService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,28 @@ import com.atguigu.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private CouponFeignService couponFeignService;
+
+    /**
+     * 获取当前会员的优惠券列表
+     * <p>
+     * 通过 OpenFeign 远程调用 coupon 服务（gulimall-coupon）的
+     * {@code /coupon/coupon/member/list} 接口，获取当前会员的优惠券列表，
+     * 连同会员信息一起返回。
+     * <p>
+     * <a href="http://localhost:8000/member/member/coupon/list">http://localhost:8000/member/member/coupon/list</a>
+     *
+     * @return 包含会员信息和优惠券列表的响应对象
+     */
+    @RequestMapping("/coupon/list")
+    public R getCouponList() {
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setNickname("张三");
+        R memberCoupons = couponFeignService.memberCoupons();
+        return R.ok().put("member", memberEntity).put("coupons", memberCoupons.get("coupons"));
+    }
 
     /**
      * 列表
