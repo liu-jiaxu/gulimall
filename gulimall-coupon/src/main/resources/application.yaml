@@ -31,26 +31,31 @@ spring:
   # Nacos配置
   cloud:
     nacos:
-      # 统一配置：discovery（注册中心）与 config（配置中心）共用该地址
-      config:
-        enabled: true
-        # 这是配置服务注册发现的
-        server-addr: 192.168.10.200:8848
-        # 指定命名空间（Nacos控制台 -> 配置管理 -> 命名空间），默认是public
-        # 注意：Nacos命名空间必须是ID，不要引入名称！
-        namespace: cb7e3766-18df-46b7-a6a1-c9cba6c6189a
-        # 指定配置组（Nacos控制台 -> 配置管理 -> 配置列表），默认是DEFAULT_GROUP
-        # 注意大小写！
-        group: COUPON_GROUP
-      # 这是配置中心的
+      # 统一配置：discovery（服务管理）与 config（配置管理）
+      # 服务管理 与 配置管理共同地址（也可以分别配置）
       server-addr: 192.168.10.200:8848
+      # 服务管理
       discovery:
         enabled: true
+        # 指定服务管理命名空间，默认是public
+#        namespace: cb7e3766-18df-46b7-a6a1-c9cba6c6189a
+        # 指定服务管理分组，默认是DEFAULT_GROUP
+#        group: COUPON_GROUP
+      # 配置管理
+      config:
+        enabled: true
+        # 指定配置管理命名空间（Nacos控制台 -> 配置管理 -> 命名空间），默认是public
+        # 注意：Nacos命名空间必须是ID，不要引入名称！
+        namespace: cb7e3766-18df-46b7-a6a1-c9cba6c6189a
+        # 指定配置管理配置组（Nacos控制台 -> 配置管理 -> 配置列表），默认是DEFAULT_GROUP
+        # 注意大小写！
+        group: COUPON_GROUP
 
-  # Nacos配置中心指定配置源
+  # Nacos配置服务指定配置源
   config:
     import:
-      - optional:nacos:gulimall.yaml  # 指定data-id
+      # 指定data-id
+      - optional:nacos:gulimall.yaml
       # 使用通配符
       - optional:nacos:${spring.application.name}.yaml
 

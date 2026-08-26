@@ -26,8 +26,21 @@ spring:
   # Nacos配置
   cloud:
     nacos:
+      # 统一配置：discovery（服务管理）与 config（配置管理）
+      # 服务管理 与 配置管理共同地址（也可以分别配置）
+      server-addr: 192.168.10.200:8848
+      # 服务管理
       discovery:
-        server-addr: 192.168.10.200:8848
+        enabled: true
+      # 配置管理
+      config:
+        enabled: true
+
+  # Nacos配置服务指定配置源
+  config:
+    import:
+      # 指定data-id
+      - optional:nacos:gulimall.yaml
 
 mybatis-plus:
   # classpath*表示自己和引入其他模块的mapper.xml都会扫描
