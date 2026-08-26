@@ -59,7 +59,7 @@ public class CouponController {
     }
 
     /**
-     * 获取会员优惠券列表（number服务远程调用）
+     * 获取会员优惠券列表（member服务远程调用）
      *   - @RequestMapping不指定访问方式时，get/post/put/delete都可以访问，实际开发会细分
      * @return 会员优惠券列表
      */

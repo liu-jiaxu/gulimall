@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface CouponFeignService {
 
     /**
-     * 获取会员优惠券列表（number服务远程调用）
+     * 获取会员优惠券列表（member服务远程调用）
      * @return 会员优惠券列表
      */
     @RequestMapping("coupon/coupon/member/list")
