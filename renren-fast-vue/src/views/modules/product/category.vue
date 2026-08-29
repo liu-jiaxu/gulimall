@@ -7,7 +7,8 @@
   数据来源：/product/category/list/tree 接口
 ============================================================= -->
 <template>
-  <!-- 分类树组件
+  <div>
+    <!-- 分类树组件
        :data                    树形数据（menus）
        :props                   节点字段映射（children 子节点、name 显示名称）
        :expand-on-click-node    点击节点是否展开（false：不因点击展开）
@@ -15,24 +16,49 @@
        node-key                 节点唯一标识字段（catId）
        ref                      组件引用名（用于调用树组件方法）
        :default-expanded-keys   默认展开的节点 key（catId）列表 -->
-  <el-tree :data="menus" :props="defaultProps" :expand-on-click-node="false" :show-checkbox="true" node-key="catId"
-    ref="menuTree" :default-expanded-keys="defalutKeys">
-    <!-- 自定义节点内容插槽：node 为树节点对象，data 为节点对应的数据 -->
-    <span class="custom-tree-node" slot-scope="{ node, data }">
-      <!-- 显示当前节点的分类名称 -->
-      <span>{{ node.label }}</span>
-      <span>
-        <!-- 新增按钮：仅当节点被勾选 且 为前两级（level <= 2）时显示 -->
-        <el-button v-if="node.checked && node.level <= 2" type="text" size="mini" @click="() => append(data)">
-          Append
-        </el-button>
-        <!-- 删除按钮：仅当节点被勾选 且 为叶子节点（无子分类）时显示 -->
-        <el-button v-if="node.checked && node.childNodes.length == 0" type="text" size="mini" @click="() => remove()">
-          Delete
-        </el-button>
+    <el-tree :data="menus" :props="defaultProps" :expand-on-click-node="false" :show-checkbox="true" node-key="catId"
+      ref="menuTree" :default-expanded-keys="expandedKey">
+      <!-- 自定义节点内容插槽：node 为树节点对象，data 为节点对应的数据 -->
+      <span class="custom-tree-node" slot-scope="{ node, data }">
+        <!-- 显示当前节点的分类名称 -->
+        <span>{{ node.label }}</span>
+        <span>
+          <!-- 新增按钮：仅当节点被勾选 且 为前两级（level <= 2）时显示 -->
+          <el-button v-if="node.checked && node.level <= 2" type="text" size="mini" @click="() => append(data)">
+            Append
+          </el-button>
+          <!-- 删除按钮：仅当节点被勾选 且 为叶子节点（无子分类）时显示 -->
+          <el-button v-if="node.checked && node.childNodes.length == 0" type="text" size="mini" @click="() => remove()">
+            Delete
+          </el-button>
+        </span>
       </span>
-    </span>
-  </el-tree>
+    </el-tree>
+
+    <!-- 新增分类对话框
+         title          对话框标题
+         :visible.sync  控制对话框显示/隐藏（与 dialogVisible 双向绑定） -->
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+      <!-- 新增分类的表单，模型为 categroy -->
+      <el-form :model="categroy">
+        <!-- 分类名称输入框，双向绑定 categroy.name -->
+        <el-form-item label="分类名称">
+          <el-input v-model="categroy.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 排序序号输入框，双向绑定 categroy.sort -->
+        <el-form-item label="排序序号（0-任意，值越大越靠前）">
+          <el-input v-model="categroy.sort" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <!-- 对话框底部操作按钮区 -->
+      <span slot="footer" class="dialog-footer">
+        <!-- 取消按钮：关闭对话框，不提交 -->
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <!-- 确定按钮：提交新增分类 -->
+        <el-button type="primary" @click="addCategory">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -49,8 +75,14 @@ export default {
       // 分类树数据（后端返回的树形结构）
       menus: [],
 
-      // 默认展开的节点 key（catId）数组，删除后用于展开指定分类
-      defalutKeys: [],
+      // 新增分类的表单数据（字段与数据库 pms_category 表对应）
+      // name：分类名称；parentCid：父分类 id；catLevel：层级；showStatus：是否显示；sort：排序
+      categroy: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
+      // 新增分类对话框是否显示（true 显示，false 隐藏）
+      dialogVisible: false,
+
+      // 默认展开的节点 key（catId）数组，新增/删除后用于展开指定分类
+      expandedKey: [],
 
       // 树节点字段映射配置
       defaultProps: {
@@ -77,9 +109,38 @@ export default {
       })
     },
 
-    // 新增分类（功能待实现，目前仅打印参数）
+    // 点击某个节点的 Append 按钮后触发：打开新增对话框并预填父分类信息
     append(data) {
-      console.log('append', data)
+      console.log("append", data);
+      // 显示新增分类对话框
+      this.dialogVisible = true;
+      // 记录新分类的父分类 id（表示在该节点下新增子分类）
+      this.categroy.parentCid = data.catId;
+      // 计算新分类的层级：当前节点层级 + 1
+      this.categroy.catLevel = data.catLevel * 1 + 1;
+    },
+
+    // 点击对话框"确定"按钮后触发：提交新增分类请求
+    addCategory() {
+      console.log("提交的数据", this.categroy);
+      // 发起请求：调用商品分类保存接口
+      this.$http({
+        url: this.$http.adornUrl("/product/category/save"),
+        method: "post",
+        data: this.$http.adornData(this.categroy, false),
+      }).then(({ data }) => {
+        // 保存成功：弹出成功提示
+        this.$message({
+          message: "添加成功",
+          type: "success",
+        });
+        // 刷新出新的菜单（重新拉取分类树）
+        this.getMenus();
+        // 设置需要默认展开的菜单（展开新分类的父分类）
+        this.expandedKey = [this.categroy.parentCid];
+        // 关闭新增分类对话框
+        this.dialogVisible = false;
+      })
     },
 
     // 批量删除被勾选且为叶子节点的分类
@@ -137,7 +198,7 @@ export default {
               }
             })
             // 过滤无效 key 并去重，设置默认展开节点
-            this.defalutKeys = [...new Set(expandKeys.filter(k => k !== undefined && k !== null))]
+            this.expandedKey = [...new Set(expandKeys.filter(k => k !== undefined && k !== null))]
             // 删除成功：打印本次删除的分类信息（id + name）
             console.log('removeInfo', removeList)
           } else {

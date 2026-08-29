@@ -53,7 +53,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 // 2.2 递归查找子分类
                 .peek(category -> category.setChildren(getChildren(category, allCategories)))
                 // 2.3 按照sort字段进行排序
-                .sorted(Comparator.comparingInt(c -> c.getSort() == null ? 0 : c.getSort()))
+                .sorted(Comparator.comparingInt((CategoryEntity c) -> c.getSort() == null ? 0 : c.getSort()).reversed())
                 .toList();
     }
 
@@ -80,7 +80,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return allCategories.stream()
                 .filter(category -> category.getParentCid().equals(rootCategory.getCatId()))
                 .peek(category -> category.setChildren(getChildren(category, allCategories)))
-                .sorted(Comparator.comparingInt(c -> c.getSort() == null ? 0 : c.getSort()))
+                .sorted(Comparator.comparingInt((CategoryEntity c) -> c.getSort() == null ? 0 : c.getSort()))
                 .toList();
     }
 
