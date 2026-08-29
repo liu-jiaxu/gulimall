@@ -11,6 +11,21 @@ server:
     context-path: /renren-fast
 
 spring:
+  application:
+    name: renren-fast
+  # Nacos配置
+  cloud:
+    nacos:
+      # 统一配置：discovery（服务管理）与 config（配置管理）
+      # 服务管理 与 配置管理共同地址（也可以分别配置）
+      server-addr: 192.168.10.200:8848
+      # 服务管理
+      discovery:
+        enabled: true
+      # 配置管理
+      config:
+        enabled: false
+
   # 环境 dev|test|prod
   profiles:
     active: dev

@@ -131,7 +131,7 @@ spring:
                   - "PUT"
                   - "DELETE"
                   - "OPTIONS"
-#                allow-credentials: true             # 允许携带 Cookie 登录态
+                allow-credentials: true             # 允许携带 Cookie 登录态（renren-fast-vue 登录 withCredentials=true 必需）
           routes:
             # ---------- coupon：短写法 + 自定义 Token 断言 ----------
             - id: coupon-route
@@ -202,3 +202,16 @@ spring:
               filters:
                 - StripPrefix=1                    # 去掉虚拟前缀 gulimall
               order: 4
+
+            - id: admin_route
+              uri: lb://renren-fast
+              predicates:
+                - Path=/gulimall/**    # 把所有gulimall开头的请求都转发给renren-fast
+              filters:
+                - RewritePath=/gulimall/(?<segment>.*),/renren-fast/$\{segment}
+                # 默认规则， 请求过来：http://localhost:88/gulimall/captcha.jpg   转发-->  http://renren-fast:8080/api/captcha.jpg
+                # 但是真正的路径是http://renren-fast:8080/renren-fast/captcha.jpg
+                # 所以使用路径重写把/gulimall/* 改变成 /renren-fast/*
+              # 必须给大 order 兜底：Gateway 未写 order 默认是 0，
+              # 会比 product-route(3) 等业务路由更优先，把 /gulimall/** 全兜到 renren-fast
+              order: 99
