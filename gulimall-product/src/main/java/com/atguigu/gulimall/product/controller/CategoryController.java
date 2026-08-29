@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -32,16 +33,23 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 列表
+     * 查询所有分类以及子分类，以树形结构组装起来
+     * <p>
+     * <a href="http://localhost:10000/product/category/list/tree">http://localhost:10000/product/category/list/tree</a>
      */
-    @RequestMapping("/list")
+    @RequestMapping("/list/tree")
     @RequiresPermissions("product:category:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryService.queryPage(params);
+    public R list(){
+        List<CategoryEntity> list = categoryService.listWithTree();
 
-        return R.ok().put("page", page);
+        /**
+         * 补充Mybatis-Plus与Hibernate的entity的set区别
+         *   - Mybatis-Plus是半自动ORM框架，查询时框架把结果集反射成一个全新的、与 DB 无关的 Java 对象返回，因此set方法不会修改数据表数据
+         *   - Hibernate是全自动ORM框架，查询时框架把结果集反射成一个与 DB 绑定的 Java 对象返回，因此set方法会修改数据表数据
+         */
+
+        return R.ok().put("data", list);
     }
-
 
     /**
      * 信息
@@ -82,7 +90,8 @@ public class CategoryController {
     @RequestMapping("/delete")
     @RequiresPermissions("product:category:delete")
     public R delete(@RequestBody Long[] catIds){
-		categoryService.removeByIds(Arrays.asList(catIds));
+//		categoryService.removeByIds(Arrays.asList(catIds));
+        categoryService.removeMenusByIds(Arrays.asList(catIds));
 
         return R.ok();
     }
