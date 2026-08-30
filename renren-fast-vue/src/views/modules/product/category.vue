@@ -28,7 +28,7 @@
             Append
           </el-button>
           <!-- 删除按钮：仅当节点被勾选 且 为叶子节点（无子分类）时显示 -->
-          <el-button v-if="node.checked && node.childNodes.length == 0" type="text" size="mini" @click="() => remove()">
+          <el-button v-if="node.checked && node.childNodes.length === 0" type="text" size="mini" @click="() => remove()">
             Delete
           </el-button>
         </span>
@@ -39,15 +39,15 @@
          title          对话框标题
          :visible.sync  控制对话框显示/隐藏（与 dialogVisible 双向绑定） -->
     <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
-      <!-- 新增分类的表单，模型为 categroy -->
-      <el-form :model="categroy">
-        <!-- 分类名称输入框，双向绑定 categroy.name -->
+      <!-- 新增分类的表单，模型为 category -->
+      <el-form :model="category">
+        <!-- 分类名称输入框，双向绑定 category.name -->
         <el-form-item label="分类名称">
-          <el-input v-model="categroy.name" autocomplete="off"></el-input>
+          <el-input v-model="category.name" autocomplete="off"></el-input>
         </el-form-item>
-        <!-- 排序序号输入框，双向绑定 categroy.sort -->
+        <!-- 排序序号输入框，双向绑定 category.sort -->
         <el-form-item label="排序序号（0-任意，值越大越靠前）">
-          <el-input v-model="categroy.sort" autocomplete="off"></el-input>
+          <el-input v-model="category.sort" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <!-- 对话框底部操作按钮区 -->
@@ -77,7 +77,7 @@ export default {
 
       // 新增分类的表单数据（字段与数据库 pms_category 表对应）
       // name：分类名称；parentCid：父分类 id；catLevel：层级；showStatus：是否显示；sort：排序
-      categroy: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
+      category: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
       // 新增分类对话框是否显示（true 显示，false 隐藏）
       dialogVisible: false,
 
@@ -115,20 +115,20 @@ export default {
       // 显示新增分类对话框
       this.dialogVisible = true;
       // 记录新分类的父分类 id（表示在该节点下新增子分类）
-      this.categroy.parentCid = data.catId;
+      this.category.parentCid = data.catId;
       // 计算新分类的层级：当前节点层级 + 1
-      this.categroy.catLevel = data.catLevel * 1 + 1;
+      this.category.catLevel = data.catLevel * 1 + 1;
     },
 
     // 点击对话框"确定"按钮后触发：提交新增分类请求
     addCategory() {
-      console.log("提交的数据", this.categroy);
+      console.log("提交的数据", this.category);
       // 发起请求：调用商品分类保存接口
       this.$http({
         url: this.$http.adornUrl("/product/category/save"),
         method: "post",
-        data: this.$http.adornData(this.categroy, false),
-      }).then(({ data }) => {
+        data: this.$http.adornData(this.category, false),
+      }).then(() => {
         // 保存成功：弹出成功提示
         this.$message({
           message: "添加成功",
@@ -137,7 +137,7 @@ export default {
         // 刷新出新的菜单（重新拉取分类树）
         this.getMenus();
         // 设置需要默认展开的菜单（展开新分类的父分类）
-        this.expandedKey = [this.categroy.parentCid];
+        this.expandedKey = [this.category.parentCid];
         // 关闭新增分类对话框
         this.dialogVisible = false;
       })
