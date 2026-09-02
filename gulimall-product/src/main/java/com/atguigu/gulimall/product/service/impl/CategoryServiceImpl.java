@@ -80,7 +80,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return allCategories.stream()
                 .filter(category -> category.getParentCid().equals(rootCategory.getCatId()))
                 .peek(category -> category.setChildren(getChildren(category, allCategories)))
-                .sorted(Comparator.comparingInt((CategoryEntity c) -> c.getSort() == null ? 0 : c.getSort()))
+                .sorted(Comparator.comparingInt((CategoryEntity c) -> c.getSort() == null ? 0 : c.getSort()).reversed())
                 .toList();
     }
 

@@ -8,6 +8,11 @@
 ============================================================= -->
 <template>
   <div>
+    <!-- 拖拽开关：控制是否开启拖拽 -->
+    <el-switch v-model="draggable" active-text="开启拖拽" inactive-text="关闭拖拽"></el-switch>
+    <!-- 批量保存按钮：开启拖拽后，把本次拖拽的所有修改一次性保存 -->
+    <el-button v-if="draggable" size="small" round @click="batchSave">批量保存</el-button>
+
     <!-- 分类树组件
        :data                    树形数据（menus）
        :props                   节点字段映射（children 子节点、name 显示名称）
@@ -15,9 +20,15 @@
        :show-checkbox           是否显示复选框
        node-key                 节点唯一标识字段（catId）
        ref                      组件引用名（用于调用树组件方法）
-       :default-expanded-keys   默认展开的节点 key（catId）列表 -->
+       :default-expanded-keys   默认展开的节点 key（catId）列表
+       :draggable               是否可拖拽（由拖拽开关 draggable 控制）
+       :allow-drop              拖拽过程中判断某位置是否允许放置
+       @node-drag-start         拖拽开始时触发（清空上次提示）
+       @node-drag-end           拖拽结束时触发（打印信息 + 提示拒绝原因）
+       @node-drop               拖拽成功放置后触发（收集需要批量更新的节点数据） -->
     <el-tree :data="menus" :props="defaultProps" :expand-on-click-node="false" :show-checkbox="true" node-key="catId"
-      ref="menuTree" :default-expanded-keys="expandedKey">
+      ref="menuTree" :default-expanded-keys="expandedKey" :draggable="draggable" :allow-drop="allowDrop"
+      @node-drag-start="handleDragStart" @node-drag-end="handleDragEnd" @node-drop="handleDrop">
       <!-- 自定义节点内容插槽：node 为树节点对象，data 为节点对应的数据 -->
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <!-- 显示当前节点的分类名称 -->
@@ -101,6 +112,18 @@ export default {
 
       // 默认展开的节点 key（catId）数组，新增/删除后用于展开指定分类
       expandedKey: [],
+
+      // 拖拽被拒绝时待提示的消息（拖拽结束后一次性弹出，避免拖拽过程反复提示）
+      dropMessage: "",
+      // 拖拽节点的层级（用于判断拖拽后是否超过三级分类）
+      draggingLevel: 0,
+
+      // 记录本次拖拽需要批量更新的节点数据
+      updateNodes: [],
+      // 批量保存后需要展开的父菜单 id 列表
+      pCid: [],
+      // 拖拽开关（true 开启拖拽）
+      draggable: false,
 
       // 树节点字段映射配置
       defaultProps: {
@@ -312,6 +335,194 @@ export default {
           type: "error"
         });
       })
+    },
+
+    /** 
+     * 树节点拖拽时的允许拖拽判断函数
+     * @param {Object} draggingNode - 被拖动的节点对象
+     * @param {Object} dropNode - 被拖放的目标节点对象
+     * @param {String} type - 拖放类型（before、after、inner）
+     * @return {Boolean} - 是否允许拖拽（true 允许，false 不允许）
+     */
+    allowDrop(draggingNode, dropNode, type) {
+      // 1.判断被拖动节点及目标节点最小层级相加是否大于 3（即拖动后是否超过三级分类）
+      this.draggingLevel = this.findChildNodeLevel(draggingNode)
+      if (type === 'inner') {
+        // 拖放类型为 inner（拖动到目标节点内部）
+        if (this.draggingLevel + dropNode.level > 3) {
+          // 仅记录拒绝原因，不弹窗（避免拖拽过程中反复提示）
+          this.dropMessage = "拖动后超过三级分类，禁止拖拽！"
+          return false;
+        }
+      } else {
+        // 拖放类型为 before/after（拖动到目标节点前/后）
+        // dropNode.parent 可能为 null（目标是根节点），此时按 0 层处理
+        const parentLevel = dropNode.parent ? dropNode.parent.level : 0
+        if (this.draggingLevel + parentLevel > 3) {
+          // 仅记录拒绝原因，不弹窗（避免拖拽过程中反复提示）
+          this.dropMessage = "拖动后超过三级分类，禁止拖拽！"
+          return false;
+        }
+      }
+      // 允许放置时清空待提示消息
+      this.dropMessage = ""
+      return true;
+    },
+
+    // 拖拽开始：清空待提示消息，避免上一次拖拽的提示残留
+    handleDragStart() {
+      // 重置拖拽层级
+      this.draggingLevel = 0
+      // 清空上一次拖拽可能残留的待提示消息
+      this.dropMessage = ""
+    },
+
+    // 拖拽结束：一次性打印拖拽信息并提示拒绝原因，避免拖拽过程中反复触发
+    handleDragEnd(draggingNode, dropNode, dropType) {
+      // 拖拽结束后一次性打印节点信息与层级
+      console.log("拖拽节点", draggingNode, "目标节点", dropNode)
+      console.log("拖拽类型", dropType)
+      console.log("拖拽节点层级", this.draggingLevel)
+      // dropNode 可能为 null（拖拽到树外部或未放到有效节点上），需做空值保护
+      if (dropNode) {
+        if (dropType === 'inner') {
+          console.log("目标节点层级", dropNode.level)
+          console.log("拖拽后层级", this.draggingLevel + dropNode.level)
+        } else {
+          // dropNode.parent 可能为 null（目标是根节点），此时按 0 层处理
+          const parentLevel = dropNode.parent ? dropNode.parent.level : 0
+          console.log("目标节点父节点层级", parentLevel)
+          console.log("拖拽后层级", this.draggingLevel + parentLevel)
+        }
+      } else {
+        console.log("拖拽未放置到有效节点（拖拽已取消）")
+      }
+      // 一次性提示拖拽被拒绝的原因，不再拖拽过程中反复弹窗
+      if (this.dropMessage) {
+        this.$message({
+          message: this.dropMessage,
+          type: "warning"
+        });
+        this.draggingLevel = 0
+        this.dropMessage = ""
+      }
+    },
+
+    /**
+     * 计算树节点的层级深度，只能读取最多三层树形结构
+     * @param {Object} node - 树节点对象
+     * @return {Number} - 节点的层级深度（1、2 或 3）
+     */
+    findChildNodeLevel(node) {
+      // 无子节点（叶子）：子树深度为 1
+      if (!node || !node.childNodes || node.childNodes.length === 0) {
+        return 1; // 如果没有子节点，返回 1
+      }
+      // 遍历子节点，若任一子节点还有子节点（有孙）：子树深度为 3
+      for (let i = 0; i < node.childNodes.length; i++) {
+        const childNode = node.childNodes[i];
+        if (childNode && childNode.childNodes && childNode.childNodes.length > 0) {
+          return 3; // 如果有3级子节点，返回 3
+        }
+      }
+      // 有子节点但子节点无子节点：子树深度为 2
+      return 2; // 如果没有3级子节点，但有2级子节点，返回 2
+    },
+
+    /**
+     * 计算树节点的子树深度，可读取任意层级树形结构
+     * @param {Object} node - 树节点对象
+     * @return {Number} - 子树深度
+     */
+    findChildNodeLevel2(node) {
+      if (!node) return 1
+      // 从 node 出发，遍历整棵子树，找出最深节点的 level
+      let maxLevel = node.level
+      const stack = node.childNodes ? [...node.childNodes] : []
+      while (stack.length > 0) {
+        const cur = stack.pop()
+        maxLevel = Math.max(maxLevel, cur.level)
+        if (cur.childNodes && cur.childNodes.length > 0) {
+          stack.push(...cur.childNodes)
+        }
+      }
+      // 子树深度 = 最深节点层级 - 自身层级 + 1
+      return maxLevel - node.level + 1
+    },
+
+    // 拖拽完成（node-drop）触发：收集本次拖拽需要批量更新的节点数据
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+      // console.log("handleDrop: ", draggingNode, dropNode, dropType);
+      // 1、当前节点最新父节点的id
+      let pCid = 0;
+      // 拖拽后的兄弟节点列表：拖到两侧用目标节点父节点的子节点，拖到内部用目标节点的子节点
+      let sibings = null;
+      if (dropType == "before" || dropType == "after") {
+        // 拖成目标节点的同级：父节点为 dropNode 的父节点
+        pCid = dropNode.parent.data.catId == undefined ? 0 : dropNode.parent.data.catId;
+        sibings = dropNode.parent.childNodes;
+      } else {
+        // 拖成目标节点的子节点：父节点为 dropNode 自身
+        pCid = dropNode.data.catId;
+        sibings = dropNode.childNodes;
+      }
+
+      // 2、当前拖拽节点的最新顺序
+      for (let i = 0; i < sibings.length; i++) {
+        if (sibings[i].data.catId == draggingNode.data.catId) {
+          // 如果遍历的是当前正在拖拽的节点
+          let catLevel = draggingNode.level;
+          if (sibings[i].level != draggingNode.level) {
+            // 当前节点的层级发生变化
+            catLevel = sibings[i].level;
+            // 修改他子节点的层级
+            this.updateChildNodeLevel(sibings[i]);
+          }
+          // sort 用倒序（length-i-1）：sort 值越大越靠前，与后端排序语义保持一致
+          this.updateNodes.push({ catId: sibings[i].data.catId, sort: sibings.length - i - 1, parentCid: pCid, catLevel: catLevel });
+        } else {
+          // 兄弟节点：只记录 catId 和最新排序（同样倒序）
+          this.updateNodes.push({ catId: sibings[i].data.catId, sort: sibings.length - i - 1 });
+        }
+      }
+
+      // 记录本次拖拽的父节点 id，用于批量保存后展开对应菜单
+      this.pCid.push(pCid);
+      console.log(this.pCid)
+
+    },
+
+    // 递归收集子节点的最新层级（拖拽后父节点层级变化，子节点层级需同步更新）
+    updateChildNodeLevel(node) {
+      if (node.childNodes.length > 0) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          // 遍历子节点，记录 catId 和最新层级
+          var cNode = node.childNodes[i].data;
+          this.updateNodes.push({ catId: cNode.catId, catLevel: node.childNodes[i].level });
+          // 递归处理子节点的子节点
+          this.updateChildNodeLevel(node.childNodes[i]);
+        }
+      }
+    },
+
+    // 点击批量保存按钮：一次性提交本次拖拽收集的所有节点修改
+    batchSave() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/update/sort"),
+        method: "post",
+        data: this.$http.adornData(this.updateNodes, false),
+      }).then(({ data }) => {
+        // 保存成功：弹出提示
+        this.$message({ message: "菜单顺序修改成功", type: "success" });
+        // 刷新出新的菜单
+        this.getMenus();
+        // 设置需要默认展开的菜单
+        this.expandedKey = this.pCid;
+        // 展开之后清空pCid，避免下次拖拽累积
+        this.pCid = [];
+      });
+      // 清空本次收集的数据，避免越拖越多
+      this.updateNodes = [];
     },
   },
 

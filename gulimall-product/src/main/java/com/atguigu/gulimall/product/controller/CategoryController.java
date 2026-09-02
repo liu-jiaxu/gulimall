@@ -52,6 +52,18 @@ public class CategoryController {
     }
 
     /**
+     * 批量保存：一次性提交所有节点修改
+     * @param category 分类数组
+     * @return R
+     */
+    @RequestMapping("/update/sort")
+    @RequiresPermissions("product:category:update")
+    public R updateSort(@RequestBody CategoryEntity[] category) {
+        categoryService.updateBatchById(Arrays.asList(category));
+        return R.ok();
+    }
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{catId}")
