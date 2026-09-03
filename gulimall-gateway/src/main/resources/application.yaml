@@ -26,5 +26,5 @@ spring:
 
   # 激活 profile=gateway：开发期加载本地 application-gateway.yaml；
   # 后期把该文件上传到 Nacos 后，由上面的 spring.config.import 覆盖
-  profiles:
-    include: gateway
+#  profiles:
+#    include: gateway

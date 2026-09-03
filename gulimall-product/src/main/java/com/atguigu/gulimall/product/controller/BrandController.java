@@ -3,8 +3,13 @@ package com.atguigu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.common.valid.AddGroup;
+import com.atguigu.common.valid.UpdateGroup;
+import com.atguigu.common.valid.UpdateGroupStatus;
+import jakarta.validation.Valid;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +64,8 @@ public class BrandController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("product:brand:save")
-    public R save(@RequestBody BrandEntity brand){
+    // @Validated 可以分组校验
+    public R save(@Validated({AddGroup.class}) @RequestBody BrandEntity brand){
 		brandService.save(brand);
 
         return R.ok();
@@ -70,8 +76,22 @@ public class BrandController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("product:brand:update")
-    public R update(@RequestBody BrandEntity brand){
+    public R update(@Validated({UpdateGroup.class}) @RequestBody BrandEntity brand){
 		brandService.updateById(brand);
+
+        return R.ok();
+    }
+
+    /**
+     * 单独修改显示状态<br>
+     * 只修改产品状态，其它数据不会提交，走默认的修改方法会触发参数校验，因此需要单独的方法和分组校验
+     * @param brand 产品
+     * @return R
+     */
+    @RequestMapping("/update/status")
+    @RequiresPermissions("product:brand:update")
+    public R updateStatus(@Validated({UpdateGroupStatus.class}) @RequestBody BrandEntity brand){
+        brandService.updateById(brand);
 
         return R.ok();
     }

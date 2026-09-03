@@ -1,5 +1,5 @@
 package com.atguigu.gulimall;
 
-public class AppTest {
+public class CommonTest {
 
 }

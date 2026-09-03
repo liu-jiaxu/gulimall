@@ -203,6 +203,16 @@ spring:
                 - StripPrefix=1                    # 去掉虚拟前缀 gulimall
               order: 4
 
+            # --------- third-party第三方依赖minIO网关设置 ----------
+            - id: third_party_route
+              uri: lb://gulimall-third-party
+              predicates:
+                - Method=POST
+                - Path=/gulimall/thirdparty/**
+              filters:
+                - RewritePath=/gulimall/thirdparty/(?<segment>.*),/$\{segment}
+              order: 5
+
             - id: admin_route
               uri: lb://renren-fast
               predicates:
