@@ -11,6 +11,7 @@
     <!-- el-upload 使用自定义上传：每次上传都会调用 httpRequest 完成一次直传 -->
     <el-upload action="#" list-type="picture-card" :file-list="fileList" :http-request="httpRequest"
       :before-upload="beforeUpload" :on-remove="handleRemove" :on-preview="handlePreview" :limit="maxCount"
+      accept=".jpg,.jpeg,.png,.gif,.ico,image/jpeg,image/png,image/gif,image/x-icon,image/vnd.microsoft.icon"
       :on-exceed="handleExceed">
       <i class="el-icon-plus"></i>
     </el-upload>
@@ -88,14 +89,21 @@ export default {
      * @returns {Boolean} 是否允许上传
      */
     beforeUpload(file) {
-      const allowTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
-      if (allowTypes.indexOf(file.type) === -1) {
-        this.$message.error('只支持jpg、png、gif格式的图片！');
-        console.warn('multiUpload.beforeUpload - invalid type', file.type)
+      //允许的扩展名与 MIME 类型。.ico 在不同系统/浏览器下 MIME 可能是 image/x-icon、
+      //image/vnd.microsoft.icon 甚至 application/octet-stream，因此同时按扩展名兜底判断
+      const allowExts = ['jpg', 'jpeg', 'png', 'gif', 'ico'];
+      const allowTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/ico'];
+      const fileName = file.name || '';
+      const ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+      const typeOk = allowTypes.indexOf(file.type) !== -1;
+      const extOk = allowExts.indexOf(ext) !== -1;
+      if (!typeOk && !extOk) {
+        this.$message.error('只支持jpg、png、gif、ico格式的文件！');
+        console.warn('multiUpload.beforeUpload - invalid type', file.type, 'ext', ext)
         return false;
       }
       if (file.size > 10 * 1024 * 1024) {
-        this.$message.error('图片大小不能超过10MB');
+        this.$message.error('文件大小不能超过10MB');
         console.warn('multiUpload.beforeUpload - file too large', file.size)
         return false;
       }

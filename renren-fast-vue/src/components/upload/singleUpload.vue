@@ -14,9 +14,10 @@
     <!-- el-upload 使用自定义上传：通过 :http-request 指定 httpRequest 方法完成直传 -->
     <el-upload action="#" :show-file-list="showFileList" :file-list="fileList" :multiple="false"
       :http-request="httpRequest" :before-upload="beforeUpload" :on-remove="handleRemove" :on-preview="handlePreview"
+      accept=".jpg,.jpeg,.png,.gif,.ico,image/jpeg,image/png,image/gif,image/x-icon,image/vnd.microsoft.icon"
       list-type="picture">
       <el-button size="small" type="primary">点击上传</el-button>
-      <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10MB</div>
+      <div slot="tip" class="el-upload__tip">只能上传jpg/png/ico文件，且不超过10MB</div>
     </el-upload>
     <!-- 预览弹窗：点击预览时展示 fileList[0].url -->
     <el-dialog :visible.sync="dialogVisible">
@@ -98,14 +99,21 @@ export default {
      * @returns {Boolean} 是否允许继续上传
      */
     beforeUpload(file) {
-      const allowTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
-      if (allowTypes.indexOf(file.type) === -1) {
-        this.$message.error('只支持jpg、png、gif格式的图片！');
-        console.warn('singleUpload.beforeUpload - invalid type', file.type)
+      //允许的扩展名与 MIME 类型。.ico 在不同系统/浏览器下 MIME 可能是 image/x-icon、
+      //image/vnd.microsoft.icon 甚至 application/octet-stream，因此同时按扩展名兜底判断
+      const allowExts = ['jpg', 'jpeg', 'png', 'gif', 'ico'];
+      const allowTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/ico'];
+      const fileName = file.name || '';
+      const ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+      const typeOk = allowTypes.indexOf(file.type) !== -1;
+      const extOk = allowExts.indexOf(ext) !== -1;
+      if (!typeOk && !extOk) {
+        this.$message.error('只支持jpg、png、gif、ico格式的文件！');
+        console.warn('singleUpload.beforeUpload - invalid type', file.type, 'ext', ext)
         return false;
       }
       if (file.size > 10 * 1024 * 1024) {
-        this.$message.error('图片大小不能超过10MB');
+        this.$message.error('文件大小不能超过10MB');
         console.warn('singleUpload.beforeUpload - file too large', file.size)
         return false;
       }
