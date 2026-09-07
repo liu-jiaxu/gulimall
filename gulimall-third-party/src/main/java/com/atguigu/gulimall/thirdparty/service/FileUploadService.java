@@ -16,10 +16,11 @@ public interface FileUploadService {
     /**
      * 生成 MinIO presigned PUT 直传 URL + GET 可访问 URL
      * @param originalFilename 原始文件名（用于生成对象 key，会加日期目录 + uuid 前缀）
+     * @param socketPackageName bucket 包名（用于区分不同业务模块的文件存储目录）
      * @return map，含：
      *         putUrl —— PUT 直传签名 URL（短时，默认 10 分钟，供前端直传文件）
      *         getUrl —— GET 可访问签名 URL（长时，默认 7 天，供前端展示图片）
      */
-    Map<String, String> getUploadUrl(String originalFilename) throws Exception;
+    Map<String, String> getUploadUrl(String originalFilename, String socketPackageName) throws Exception;
 
 }

@@ -28,15 +28,16 @@ public class FileUploadController {
     /**
      * 获取 MinIO presigned URL（前端直传 MinIO，后端不碰文件流）
      * <p>
-     * <a href="http://localhost:30000/admin/system/minio/uploadUrl?fileName=test.png">http://localhost:30000/admin/system/minio/uploadUrl?fileName=test.png</a>
+     * <a href="http://localhost:30000/admin/system/minio/uploadUrl?fileName=test.png&bucketPackageName=test">http://localhost:30000/admin/system/minio/uploadUrl?fileName=test.png&bucketPackageName=test</a>
      * @param fileName 原始文件名
+     * @param bucketPackageName bucket 包名（用于区分不同业务模块的文件存储目录）
      * @return uploadUrl —— PUT 直传地址（短时 10 分钟）
      *         fileUrl   —— GET 可访问地址（7 天，前端存它用于图片展示）
      */
     @PostMapping("/uploadUrl")
-    public R getUploadUrl(@RequestParam("fileName") String fileName) {
+    public R getUploadUrl(@RequestParam("fileName") String fileName, @RequestParam("bucketPackageName") String bucketPackageName) {
         try {
-            Map<String, String> urls = fileUploadService.getUploadUrl(fileName);
+            Map<String, String> urls = fileUploadService.getUploadUrl(fileName, bucketPackageName);
             return R.ok()
                     .put("uploadUrl", urls.get("putUrl"))
                     .put("fileUrl", urls.get("getUrl"));

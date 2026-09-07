@@ -30,7 +30,8 @@ import axios from 'axios' // 原生 axios，直传 MinIO 不能带全局拦截�
 export default {
   name: 'singleUpload',
   props: {
-    value: String
+    value: String,
+    type: String
   },
   computed: {
     imageUrl() {
@@ -120,11 +121,14 @@ export default {
       const file = option.file;
       try {
         /** 请求后端签发 presigned PUT URL（该接口同时返回用于回显的 GET URL） */
-        console.log('singleUpload.httpRequest - request presigned url', { fileName: file.name })
+        console.log('singleUpload.httpRequest - request presigned url', { fileName: file.name, bucketPackageName: this.type })
         const res = await this.$http({
           url: this.$http.adornUrl('/thirdparty/admin/system/minio/uploadUrl'),
           method: 'post',
-          params: { fileName: file.name }   // 后端 @RequestParam("fileName")
+          params: {
+            fileName: file.name,   // 后端 @RequestParam("fileName")
+            bucketPackageName: this.type   // 上传到 MinIO 桶的包名
+          }
         });
         const data = res.data || {};
         /** 后端返回签名信息（uploadUrl, fileUrl 等） */

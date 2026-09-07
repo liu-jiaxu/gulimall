@@ -20,7 +20,7 @@
       </el-form-item>
       <!-- 品牌 logo：使用 singleUpload 组件上传并回显，value 为 GET 可访问地址（通常为 presigned URL） -->
       <el-form-item label="品牌logo" prop="logo">
-        <singleUpload v-model="dataForm.logo"></singleUpload>
+        <singleUpload v-model="dataForm.logo" type="brand"></singleUpload>
       </el-form-item>
       <!-- 品牌介绍：必填 -->
       <el-form-item label="介绍" prop="descript">
@@ -102,7 +102,7 @@ export default {
         sort: [
           {
             validator: (rule, value, callback) => {
-              if (value == '') {
+              if (value != '0' && value == '') {
                 callback(new Error('排序必须填写'))
               } else if (!Number.isInteger(value) || value < 0) {
                 callback(new Error('排序必须是一个非负整数'))

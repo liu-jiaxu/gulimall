@@ -7,6 +7,7 @@ import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.http.Method;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,7 +41,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     @Override
-    public Map<String, String> getUploadUrl(String originalFilename) throws Exception {
+    public Map<String, String> getUploadUrl(String originalFilename, String bucketPackageName) throws Exception {
         // 判断桶是否存在，不存在则创建
         boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioProperties.getBucketName()).build());
         if (!found) {
@@ -48,9 +49,10 @@ public class FileUploadServiceImpl implements FileUploadService {
         }
 
         // 对象 key：日期目录/uuid+原文件名（如 2026-09-02/443e...a901.png）
-        String dateDir = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        String packageName = StringUtils.isNotBlank(bucketPackageName) ? bucketPackageName + "/" : "default/";
+        String dateDir = LocalDate.now().format(DateTimeFormatter.ISO_DATE) + "/";
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String objectName = dateDir + "/" + uuid + originalFilename;
+        String objectName = packageName + dateDir + uuid + originalFilename;
 
         // PUT 直传签名 URL（前端拿到后直接 PUT 文件二进制到该 URL）
         String putUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()

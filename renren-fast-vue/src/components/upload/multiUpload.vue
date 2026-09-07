@@ -32,7 +32,8 @@ export default {
     maxCount: {
       type: Number,
       default: 30
-    }
+    },
+    type: String // 上传到 MinIO 桶时使用的包名（由调用方指定）
   },
   data() {
     return {
@@ -116,11 +117,11 @@ export default {
       const file = option.file;
       try {
         /** 请求后端签发 presigned PUT URL（每张图片单独签名） */
-        console.log('multiUpload.httpRequest - request presigned url', { fileName: file.name })
+        console.log('multiUpload.httpRequest - request presigned url', { fileName: file.name, bucketPackageName: this.type })
         const res = await this.$http({
           url: this.$http.adornUrl('/thirdparty/admin/system/minio/uploadUrl'),
           method: 'post',
-          params: { fileName: file.name }   // 后端 @RequestParam("fileName")
+          params: { fileName: file.name, bucketPackageName: this.type }
         });
         const data = res.data || {};
         console.log('multiUpload.httpRequest - presigned response', data)
