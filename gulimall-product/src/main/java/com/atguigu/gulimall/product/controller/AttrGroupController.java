@@ -3,6 +3,8 @@ package com.atguigu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.service.CategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,17 +29,22 @@ import com.atguigu.common.utils.R;
  */
 @RestController
 @RequestMapping("product/attrgroup")
+@Slf4j
 public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
+    @Autowired
+    private CategoryService categoryService;
 
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @RequestMapping("/list/{catelogId}")
     @RequiresPermissions("product:attrgroup:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrGroupService.queryPage(params);
+    public R list(@PathVariable Long catelogId, @RequestParam Map<String, Object> params){
+//        PageUtils page = attrGroupService.queryPage(params);
+
+        PageUtils page = attrGroupService.queryPage(params, catelogId);
 
         return R.ok().put("page", page);
     }
@@ -50,6 +57,13 @@ public class AttrGroupController {
     @RequiresPermissions("product:attrgroup:info")
     public R info(@PathVariable("attrGroupId") Long attrGroupId){
 		AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
+
+        // 新增分组信息时，保存的是新增的三级分类id，重新修改分组信息时，需要回显出完整的三级分类路径
+        Long catelogId = attrGroup.getCatelogId();
+        log.info("catelogId: {}", catelogId);
+        Long[] catelogPath = categoryService.findCatelogPath(catelogId);
+        log.info("分类路径: {}", Arrays.toString(catelogPath));
+        attrGroup.setCatelogPath(catelogPath);
 
         return R.ok().put("attrGroup", attrGroup);
     }

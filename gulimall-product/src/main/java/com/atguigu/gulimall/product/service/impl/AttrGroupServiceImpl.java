@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +26,41 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+        String key = (String) params.get("key");
+        if (catelogId == 0) {
+            // 没有三级分类
+            IPage<AttrGroupEntity> page = this.page(
+                    new Query<AttrGroupEntity>().getPage(params),
+                    new QueryWrapper<AttrGroupEntity>().and(w -> w.eq("attr_group_id", key).or().like("attr_group_name", key))
+            );
+            return new PageUtils(page);
+        } else {
+            // 有三级分类
+            // select * from pms_attr_group where catelog_id = ? and (attr_group_id = ? or attr_group_name like ?)
+            QueryWrapper<AttrGroupEntity> wrapper = new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId);
+            if (StringUtils.isNotBlank(key)) {
+                wrapper.and(w -> w.eq("attr_group_id", key).or().like("attr_group_name", key));
+            }
+            IPage<AttrGroupEntity> page = this.page(
+                    new Query<AttrGroupEntity>().getPage(params),
+                    wrapper
+            );
+
+//            LambdaQueryWrapper<AttrGroupEntity> wrapper1 = new LambdaQueryWrapper<AttrGroupEntity>()
+//                    .eq(AttrGroupEntity::getCatelogId, catelogId);
+//            if (StringUtils.isNotBlank(key)) {
+//                wrapper1.and(w -> w.eq(AttrGroupEntity::getAttrGroupId, key)
+//                            .or()
+//                            .like(AttrGroupEntity::getAttrGroupName, key)
+//                    );
+//                }
+
+            return new PageUtils(page);
+        }
     }
 
 }

@@ -67,6 +67,29 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
+     * 找到catelogId的完整路径 [父/子/孙]
+     * @param catelogId
+     * @return
+     */
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> path = new java.util.ArrayList<>();
+        findParentPath(catelogId, path);
+        return path.toArray(new Long[0]);
+    }
+
+    private void findParentPath(Long catelogId, List<Long> path) {
+        // 1.查询当前节点
+        CategoryEntity category = this.getById(catelogId);
+        if (category != null) {
+            // 2.将当前节点的ID添加到路径中
+            path.addFirst(catelogId);
+            // 3.递归查找父节点
+            findParentPath(category.getParentCid(), path);
+        }
+    }
+
+    /**
      * 递归查找子分类
      * @param rootCategory 子分类的根节点
      * @param allCategories 所有分类
