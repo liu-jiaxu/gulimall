@@ -92,6 +92,13 @@ export default {
         //     trigger: "blur"
         //   }
         // ],
+        attrGroupId: [
+          {
+            required: true,
+            message: "所属分组不能为空",
+            trigger: "blur"
+          }
+        ],
         icon: [
           { required: true, message: "属性图标不能为空", trigger: "blur" }
         ],

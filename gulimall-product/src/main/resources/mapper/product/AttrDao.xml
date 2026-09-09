@@ -16,5 +16,25 @@
         <result property="showDesc" column="show_desc"/>
     </resultMap>
 
+    <!-- 分页查询指定属性分组【未关联】的属性（MyBatis-Plus 分页插件自动拼 LIMIT/COUNT） -->
+    <select id="selectNoRelationAttr" resultMap="attrMap">
+        # 太懒了直接a.*了
+        SELECT a.*
+        FROM pms_attr a
+        WHERE a.attr_type = 1
+          AND a.catelog_id IN (
+                SELECT g.catelog_id
+                FROM pms_attr_group g
+                WHERE g.attr_group_id = #{attrGroupId}
+          )
+          AND NOT EXISTS (
+                SELECT 1
+                FROM pms_attr_attrgroup_relation r
+                WHERE r.attr_id = a.attr_id
+          )
+        <if test="key != null and key != ''">
+          AND ( a.attr_id = #{key} OR a.attr_name LIKE CONCAT('%', #{key}, '%') )
+        </if>
+    </select>
 
 </mapper>
