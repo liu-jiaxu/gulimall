@@ -86,13 +86,14 @@ public class CategoryController {
     }
 
     /**
-     * 修改
+     * 修改功能<br>
+     * 因为存在品牌分类关联表，所以修改品牌信息需要级联更新<br>
      */
     @RequestMapping("/update")
     @RequiresPermissions("product:category:update")
     public R update(@RequestBody CategoryEntity category){
-		categoryService.updateById(category);
-
+//		categoryService.updateById(category);
+        categoryService.updateDetails(category);
         return R.ok();
     }
 

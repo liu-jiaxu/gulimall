@@ -72,13 +72,14 @@ public class BrandController {
     }
 
     /**
-     * 修改
+     * 修改功能<br>
+     * 因为存在品牌分类关联表，所以修改品牌信息需要级联更新<br>
      */
     @RequestMapping("/update")
     @RequiresPermissions("product:brand:update")
     public R update(@Validated({UpdateGroup.class}) @RequestBody BrandEntity brand){
-		brandService.updateById(brand);
-
+//		brandService.updateById(brand);
+        brandService.updateDetails(brand);
         return R.ok();
     }
 

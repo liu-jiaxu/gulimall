@@ -2,7 +2,7 @@
   品牌新增 / 修改 弹窗组件
   功能说明：
     1. 用于品牌的新增与修改（复用同一对话框，依据 `brandId` 判断）
-    2. 使用 `singleUpload` 组件上传并回显 logo（上传成功后 dataForm.logo 保存可访问 URL）
+    2. 使用 `SingleUpload` 组件上传并回显 logo（上传成功后 dataForm.logo 保存可访问 URL）
     3. 包含前端校验规则（品牌名、logo、介绍、首字母、排序）
   交互说明：
     - 调用方通过 `ref` 调用 `init(id)` 初始化（id 为 0/空 表示新增）
@@ -18,7 +18,7 @@
       <el-form-item label="品牌名" prop="name">
         <el-input v-model="dataForm.name" placeholder="品牌名"></el-input>
       </el-form-item>
-      <!-- 品牌 logo：使用 singleUpload 组件上传并回显，value 为 GET 可访问地址（通常为 presigned URL） -->
+      <!-- 品牌 logo：使用 SingleUpload 组件上传并回显，value 为 GET 可访问地址（通常为 presigned URL） -->
       <el-form-item label="品牌logo" prop="logo">
         <singleUpload v-model="dataForm.logo" type="brand"></singleUpload>
       </el-form-item>
@@ -49,14 +49,14 @@
 </template>
 
 <script>
-// singleUpload 组件用于直传 MinIO 并回显可访问的文件 URL（通常为 presigned GET URL）
-import singleUpload from "@/components/upload/singleUpload"
+// SingleUpload 组件用于直传 MinIO 并回显可访问的文件 URL（通常为 presigned GET URL）
+import SingleUpload from "@/components/upload/singleUpload"
 
 export default {
 
-  // 局部注册 singleUpload 组件
+  // 局部注册 SingleUpload 组件
   components: {
-    singleUpload
+    SingleUpload
   },
 
   data() {

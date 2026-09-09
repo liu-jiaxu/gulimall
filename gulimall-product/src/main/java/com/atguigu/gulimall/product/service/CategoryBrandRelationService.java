@@ -16,5 +16,19 @@ import java.util.Map;
 public interface CategoryBrandRelationService extends IService<CategoryBrandRelationEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 检查是否存在相同的品牌和分类记录
+     * @param brandId 品牌ID
+     * @param catelogId 分类ID
+     * @return 相同记录的数量
+     */
+    long checkSameRecord(Long brandId, Long catelogId);
+
+    /**
+     * 保存品牌和分类关联关系的详细信息
+     * @param categoryBrandRelation 品牌分类关联实体对象
+     */
+    void saveDetails(CategoryBrandRelationEntity categoryBrandRelation);
 }
 

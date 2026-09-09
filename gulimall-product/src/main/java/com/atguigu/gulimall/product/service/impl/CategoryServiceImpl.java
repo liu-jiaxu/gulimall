@@ -2,19 +2,25 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
+import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.method.CategoryMethod;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Service("categoryService")
@@ -22,12 +28,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryDao categoryDao;
+    @Autowired
+    private CategoryBrandRelationDao categoryBrandRelationDao;
+    @Autowired
+    private CategoryMethod categoryMethod;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CategoryEntity> page = this.page(
                 new Query<CategoryEntity>().getPage(params),
-                new QueryWrapper<CategoryEntity>()
+                new QueryWrapper<>()
         );
 
         return new PageUtils(page);
@@ -73,19 +83,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      */
     @Override
     public Long[] findCatelogPath(Long catelogId) {
-        List<Long> path = new java.util.ArrayList<>();
-        findParentPath(catelogId, path);
-        return path.toArray(new Long[0]);
+        return categoryMethod.findCatelogPath(catelogId);
     }
 
-    private void findParentPath(Long catelogId, List<Long> path) {
-        // 1.查询当前节点
-        CategoryEntity category = this.getById(catelogId);
-        if (category != null) {
-            // 2.将当前节点的ID添加到路径中
-            path.addFirst(catelogId);
-            // 3.递归查找父节点
-            findParentPath(category.getParentCid(), path);
+    /**
+     * 修改功能<br>
+     * 因为存在品牌分类关联表，所以修改品牌信息需要级联更新<br>
+     * @param category 分类实体
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateDetails(CategoryEntity category) {
+        // 1.更新当前分类
+        this.updateById(category);
+        // 2.级联更新品牌分类关联表中的分类名称
+        if (StringUtils.isNotEmpty(category.getName())) {
+            categoryBrandRelationDao.updateCatelogName(category.getCatId(), category.getName());
         }
     }
 

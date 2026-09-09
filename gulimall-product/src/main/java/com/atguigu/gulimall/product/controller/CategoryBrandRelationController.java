@@ -1,15 +1,19 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.atguigu.common.enums.BizCodeEnum;
+import com.atguigu.gulimall.product.entity.BrandEntity;
+import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.BrandService;
+import com.atguigu.gulimall.product.service.CategoryService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
@@ -27,21 +31,26 @@ import com.atguigu.common.utils.R;
  */
 @RestController
 @RequestMapping("product/categorybrandrelation")
+@Slf4j
 public class CategoryBrandRelationController {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private BrandService brandService;
 
     /**
-     * 列表
+     * 获取当前品牌关联的所有分类列表
      */
-    @RequestMapping("/list")
+    @GetMapping("/catelog/list")
     @RequiresPermissions("product:categorybrandrelation:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryBrandRelationService.queryPage(params);
+    public R list(@RequestParam("brandId") Long brandId){
+        List<CategoryBrandRelationEntity> list = categoryBrandRelationService.list(
+                new QueryWrapper<CategoryBrandRelationEntity>().eq("brand_id", brandId));
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", list);
     }
-
 
     /**
      * 信息
@@ -57,11 +66,23 @@ public class CategoryBrandRelationController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     @RequiresPermissions("product:categorybrandrelation:save")
     public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
-		categoryBrandRelationService.save(categoryBrandRelation);
 
+        log.info("categoryBrandRelation: {}", categoryBrandRelation);
+
+        // 查询是否存在相同的品牌和分类记录
+        long count = categoryBrandRelationService.checkSameRecord(
+                categoryBrandRelation.getBrandId(), categoryBrandRelation.getCatelogId());
+        log.info("checkSameRecord result: {}", count);
+        if (count > 0) {
+            // 如果存在相同的品牌和分类记录，返回错误响应
+            return R.error(BizCodeEnum.SAME_RECORD_EXCEPTION.getCode(), BizCodeEnum.SAME_RECORD_EXCEPTION.getMsg());
+        }
+
+        // 保存品牌和分类关联关系的详细信息
+        categoryBrandRelationService.saveDetails(categoryBrandRelation);
         return R.ok();
     }
 
