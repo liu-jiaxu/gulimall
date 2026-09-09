@@ -1,4 +1,4 @@
-package com.atguigu.gulimall;
+package com.atguigu.gulimall.product;
 
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.service.BrandService;
