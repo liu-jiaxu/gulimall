@@ -108,11 +108,32 @@
 		<dependency>
 			<groupId>com.alibaba.cloud</groupId>
 			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+			<exclusions>
+				<!-- 排除 Nacos 日志适配器：它会抢占并重载 logback 配置，覆盖应用自定义的 root 级别 -->
+				<exclusion>
+					<groupId>com.alibaba.nacos</groupId>
+					<artifactId>logback-adapter</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.alibaba.nacos</groupId>
+					<artifactId>nacos-log4j2-adapter</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Spring Cloud Alibaba Nacos 配置中心 -->
 		<dependency>
 			<groupId>com.alibaba.cloud</groupId>
 			<artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.alibaba.nacos</groupId>
+					<artifactId>logback-adapter</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.alibaba.nacos</groupId>
+					<artifactId>nacos-log4j2-adapter</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- OpenFeign 远程调用 -->
 		<dependency>

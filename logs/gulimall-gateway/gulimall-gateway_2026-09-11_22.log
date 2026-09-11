@@ -1,0 +1,15 @@
+2026-09-11 22:46:56.074 [main] INFO  org.springframework.boot.StartupInfoLogger.logStarting:53 - Starting GulimallGatewayApplication using Java 21.0.1 with PID 31472 (D:\SoftwareInstallation\gulimall\gulimall-gateway\target\classes started by zgh29 in D:\SoftwareInstallation\gulimall)
+2026-09-11 22:46:56.078 [main] INFO  org.springframework.boot.SpringApplication.logStartupProfileInfo:652 - No active profile set, falling back to 1 default profile: "default"
+2026-09-11 22:46:59.739 [main] INFO  org.springframework.boot.StartupInfoLogger.logStarted:59 - Started GulimallGatewayApplication in 5.661 seconds (process running for 6.533)
+2026-09-11 22:49:09.687 [reactor-http-nio-3] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.filter:31 - uri:http://localhost:88/gulimall/sys/menu/nav?t=1789138149495, request:org.springframework.http.server.reactive.ReactorServerHttpRequest@6739c9d2, response:org.springframework.http.server.reactive.ReactorServerHttpResponse@1005d00a
+2026-09-11 22:49:09.687 [reactor-http-nio-3] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.filter:32 - start:1789138149687
+2026-09-11 22:49:10.123 [reactor-http-nio-5] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.lambda$filter$0:38 - end:1789138150123
+2026-09-11 22:49:10.124 [reactor-http-nio-5] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.lambda$filter$0:39 - cost:436
+2026-09-11 22:49:10.185 [reactor-http-nio-3] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.filter:31 - uri:http://localhost:88/gulimall/sys/user/info?t=1789138150155, request:org.springframework.http.server.reactive.ReactorServerHttpRequest@716f555e, response:org.springframework.http.server.reactive.ReactorServerHttpResponse@26789614
+2026-09-11 22:49:10.185 [reactor-http-nio-3] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.filter:32 - start:1789138150185
+2026-09-11 22:49:10.213 [reactor-http-nio-5] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.lambda$filter$0:38 - end:1789138150213
+2026-09-11 22:49:10.214 [reactor-http-nio-5] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.lambda$filter$0:39 - cost:28
+2026-09-11 22:49:10.307 [reactor-http-nio-3] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.filter:31 - uri:http://localhost:88/gulimall/product/brand/list?t=1789138150278&page=1&limit=10&key=, request:org.springframework.http.server.reactive.ReactorServerHttpRequest@6edfdc48, response:org.springframework.http.server.reactive.ReactorServerHttpResponse@c752fb1
+2026-09-11 22:49:10.308 [reactor-http-nio-3] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.filter:32 - start:1789138150307
+2026-09-11 22:49:11.080 [reactor-http-nio-6] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.lambda$filter$0:38 - end:1789138151080
+2026-09-11 22:49:11.080 [reactor-http-nio-6] INFO  com.atguigu.gulimall.gateway.filter.RtGlobalFilter.lambda$filter$0:39 - cost:773

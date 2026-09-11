@@ -1,0 +1,3 @@
+2026-09-11 22:47:01.807 [main] INFO  org.springframework.boot.StartupInfoLogger.logStarting:53 - Starting GulimallThirdPartyApplication using Java 21.0.1 with PID 11780 (D:\SoftwareInstallation\gulimall\gulimall-third-party\target\classes started by zgh29 in D:\SoftwareInstallation\gulimall)
+2026-09-11 22:47:01.810 [main] INFO  org.springframework.boot.SpringApplication.logStartupProfileInfo:652 - No active profile set, falling back to 1 default profile: "default"
+2026-09-11 22:47:05.215 [main] INFO  org.springframework.boot.StartupInfoLogger.logStarted:59 - Started GulimallThirdPartyApplication in 5.584 seconds (process running for 6.558)
