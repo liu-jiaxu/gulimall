@@ -70,6 +70,10 @@ export default {
         console.log("category-cascader.getCategorys - categorys", this.categorys);
         //等级联数据渲染完成后再按当前文字调整一次宽度
         this.$nextTick(() => this.resizeInput());
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       });
     },
     //让级联输入框根据文字自动伸缩宽度：初始宽度不变，文字变长时自动加宽

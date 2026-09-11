@@ -138,6 +138,7 @@ export default {
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
+            console.log(data);
             console.log('brand-add-or-update.init - response', data)
             if (data && data.code === 0) {
               // 注意：data.brand 可能是后端接口的返回结构，请以接口实际字段为准
@@ -179,6 +180,7 @@ export default {
             method: 'post',
             data: this.$http.adornData(payload)
           }).then(({ data }) => {
+            console.log(data);
             console.log('brand-add-or-update.dataFormSubmit - response', data)
             if (data && data.code === 0) {
               this.$message({

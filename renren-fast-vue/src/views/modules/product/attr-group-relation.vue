@@ -116,6 +116,7 @@ export default {
         method: "post",
         data: this.$http.adornData(postData, false)
       }).then(({ data }) => {
+        console.log(data);
         if (data.code == 0) {
           this.$message({ type: "success", message: "删除成功" });
           this.init(this.attrGroupId);
@@ -133,6 +134,7 @@ export default {
         method: "post",
         data: this.$http.adornData(data, false)
       }).then(({ data }) => {
+        console.log(data);
         if (data.code == 0) {
           this.$message({ type: "success", message: "删除成功" });
           this.init(this.attrGroupId);
@@ -155,6 +157,7 @@ export default {
           method: "post",
           data: this.$http.adornData(postData, false)
         }).then(({ data }) => {
+          console.log(data);
           if (data.code == 0) {
             this.$message({ type: "success", message: "新增关联成功" });
           }
@@ -174,7 +177,12 @@ export default {
         method: "get",
         params: this.$http.adornParams({})
       }).then(({ data }) => {
+        console.log(data);
         this.relationAttrs = data.data;
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       });
     },
     dialogClose() { },
@@ -194,6 +202,7 @@ export default {
           key: this.dataForm.key
         })
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;

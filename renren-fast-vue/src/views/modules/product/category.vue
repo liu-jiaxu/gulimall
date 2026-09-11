@@ -144,10 +144,15 @@ export default {
         url: this.$http.adornUrl('/product/category/list/tree'),
         method: 'get'
       }).then(({ data }) => {
+        console.log(data);
         // 请求成功：把返回的分类树数据存入 menus
         this.menus = data.data
         console.log('成功了获取到菜单数据....', data.data)
-      })
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
+      });
     },
 
     // 对话框"确定"按钮的统一入口：根据对话框类型分发到新增或修改方法
@@ -201,11 +206,9 @@ export default {
         // 关闭新增分类对话框
         this.dialogVisible = false;
       }).catch(() => {
-        // 保存失败：弹出错误提示，避免用户误以为添加成功
-        this.$message({
-          message: "添加失败",
-          type: "error"
-        });
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       })
     },
 
@@ -237,14 +240,18 @@ export default {
           method: 'post',
           data: this.$http.adornData(catIds, false)
         }).then(({ data }) => {
+          console.log(data);
           // 根据后端返回的 code 判断删除是否成功
           if (data && data.code === 0) {
             // 删除成功：弹出成功提示
             this.$message({
               message: '删除成功',
               type: 'success'
-            })
-            // 删除成功：重新拉取分类树以刷新页面数据
+            }).catch((error) => {
+              console.error(error);
+              const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+              this.$message.error(msg);
+            });// 删除成功：重新拉取分类树以刷新页面数据
             this.getMenus()
             // 删除成功：遍历所有被删节点，收集需要展开的父/祖父节点 key
             const expandKeys = []
@@ -278,7 +285,10 @@ export default {
           console.log('removeResult', data)
         })
       }).catch(() => {
-        // 用户点击"取消"，或请求过程中出错：不做任何处理
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
+
       })
     },
 
@@ -294,6 +304,7 @@ export default {
         url: this.$http.adornUrl(`/product/category/info/${data.catId}`),
         method: 'get',
       }).then(({ data }) => {
+        console.log(data);
         console.log("回显数据", data)
         // parentCid: 0, catLevel: 0, showStatus: 1, 
         this.category.name = data.data.name
@@ -305,7 +316,11 @@ export default {
         this.category.parentCid = data.data.parentCid
         this.category.catLevel = data.data.catLevel
         this.category.showStatus = data.data.showStatus
-      })
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
+      });
     },
 
     // 提交修改分类请求（通过 update 接口更新该分类数据）
@@ -329,11 +344,9 @@ export default {
         // 关闭修改分类对话框
         this.dialogVisible = false;
       }).catch(() => {
-        // 保存失败：弹出错误提示，避免用户误以为修改成功
-        this.$message({
-          message: "修改失败",
-          type: "error"
-        });
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       })
     },
 
@@ -512,6 +525,7 @@ export default {
         method: "post",
         data: this.$http.adornData(this.updateNodes, false),
       }).then(({ data }) => {
+        console.log(data);
         // 保存成功：弹出提示
         this.$message({ message: "菜单顺序修改成功", type: "success" });
         // 刷新出新的菜单
@@ -520,6 +534,10 @@ export default {
         this.expandedKey = this.pCid;
         // 展开之后清空pCid，避免下次拖拽累积
         this.pCid = [];
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       });
       // 清空本次收集的数据，避免越拖越多
       this.updateNodes = [];

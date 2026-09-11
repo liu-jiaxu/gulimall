@@ -79,7 +79,12 @@ export default {
         url: this.$http.adornUrl("/product/category/list/tree"),
         method: "get"
       }).then(({ data }) => {
+        console.log(data);
         this.categorys = data.data;
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       });
     },
     init(id) {
@@ -95,6 +100,7 @@ export default {
             method: "get",
             params: this.$http.adornParams()
           }).then(({ data }) => {
+            console.log(data);
             if (data && data.code === 0) {
               this.dataForm.attrGroupName = data.attrGroup.attrGroupName;
               this.dataForm.sort = data.attrGroup.sort;
@@ -104,6 +110,10 @@ export default {
               //查出catelogId的完整路径
               this.catelogPath = data.attrGroup.catelogPath;
             }
+          }).catch((error) => {
+            console.error(error);
+            const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+            this.$message.error(msg);
           });
         }
       });
@@ -127,6 +137,7 @@ export default {
               catelogId: this.catelogPath[this.catelogPath.length - 1]
             })
           }).then(({ data }) => {
+            console.log(data);
             if (data && data.code === 0) {
               this.$message({
                 message: "操作成功",

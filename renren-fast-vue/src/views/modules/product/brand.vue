@@ -138,6 +138,7 @@ export default {
         method: "post",
         data: this.$http.adornData({ brandId: this.brandId, catelogId: this.catelogPath[this.catelogPath.length - 1] }, false)
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.getCateRelation();
           this.$message({
@@ -156,6 +157,7 @@ export default {
         method: "post",
         data: this.$http.adornData([id], false)
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.getCateRelation();
           this.$message({
@@ -181,6 +183,7 @@ export default {
           brandId: this.brandId
         })
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.cateRelationTableData = data.data;
         } else {
@@ -209,6 +212,7 @@ export default {
           'key': this.dataForm.key
         })
       }).then(({ data }) => {
+        console.log(data);
         /**
          * 响应处理：打印后端原始返回结果，便于在控制台查看数据库返回内容
          */
@@ -234,6 +238,7 @@ export default {
         method: "post",
         data: this.$http.adornData({ brandId, showStatus }, false)
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.$message({
             type: "success",
@@ -304,6 +309,7 @@ export default {
           method: 'post',
           data: this.$http.adornData(ids, false)
         }).then(({ data }) => {
+          console.log(data);
           /**
            * 后端响应：打印删除接口返回内容
            */
@@ -341,6 +347,7 @@ export default {
           'showStatus': data.showStatus
         }, false)
       }).then(({ data }) => {
+        console.log(data);
         /**
          * 后端返回：打印更新接口返回的完整数据
          */

@@ -1,12 +1,7 @@
 <template>
   <div class="mod-config">
-    <el-table
-      :data="dataList"
-      border
-      v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
-      style="width: 100%;"
-    >
+    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle"
+      style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="id"></el-table-column>
       <el-table-column prop="spuName" header-align="center" align="center" label="名称"></el-table-column>
@@ -25,26 +20,16 @@
       <el-table-column prop="updateTime" header-align="center" align="center" label="修改时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.publishStatus == 0"
-            type="text"
-            size="small"
-            @click="productUp(scope.row.id)"
-          >上架</el-button>
+          <el-button v-if="scope.row.publishStatus == 0" type="text" size="small"
+            @click="productUp(scope.row.id)">上架</el-button>
           <el-button type="text" size="small" @click="attrUpdateShow(scope.row)">规格</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper"
-    ></el-pagination>
+    <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex"
+      :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage"
+      layout="total, sizes, prev, pager, next, jumper"></el-pagination>
   </div>
 </template>
 
@@ -79,6 +64,7 @@ export default {
         url: this.$http.adornUrl("/product/spuinfo/" + id + "/up"),
         method: "post"
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.$message({
             message: "操作成功",
@@ -113,6 +99,7 @@ export default {
         method: "get",
         params: this.$http.adornParams(param)
       }).then(({ data }) => {
+        console.log(data);
         if (data && data.code === 0) {
           this.dataList = data.page.list;
           this.totalPage = data.page.totalCount;
@@ -139,7 +126,7 @@ export default {
       this.dataListSelections = val;
     },
     // 新增 / 修改
-    addOrUpdateHandle(id) {}
+    addOrUpdateHandle(id) { }
   },
   mounted() {
     this.dataSub = PubSub.subscribe("dataForm", (msg, val) => {

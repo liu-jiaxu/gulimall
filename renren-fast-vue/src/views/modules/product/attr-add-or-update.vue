@@ -154,6 +154,7 @@ export default {
           method: "get",
           params: this.$http.adornParams({ page: 1, limit: 10000000 })
         }).then(({ data }) => {
+          console.log(data);
           if (data && data.code === 0) {
             this.attrGroups = data.page.list;
           } else {
@@ -184,6 +185,7 @@ export default {
             method: "get",
             params: this.$http.adornParams()
           }).then(({ data }) => {
+            console.log(data);
             if (data && data.code === 0) {
               this.dataForm.attrName = data.attr.attrName;
               this.dataForm.searchType = data.attr.searchType;
@@ -199,6 +201,10 @@ export default {
               this.catelogPath = data.attr.catelogPath;
               this.$nextTick(() => {
                 this.dataForm.attrGroupId = data.attr.attrGroupId;
+              }).catch((error) => {
+                console.error(error);
+                const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+                this.$message.error(msg);
               });
             }
           });
@@ -228,6 +234,7 @@ export default {
               showDesc: this.dataForm.showDesc
             })
           }).then(({ data }) => {
+            console.log(data);
             if (data && data.code === 0) {
               this.$message({
                 message: "操作成功",

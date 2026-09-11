@@ -120,6 +120,7 @@ export default {
           key: this.dataForm.key
         })
       }).then(({ data }) => {
+        console.log(data);
         console.log("获取数据列表", data);
         if (data && data.code === 0) {
           this.dataList = data.page.list;
@@ -174,6 +175,7 @@ export default {
           method: "post",
           data: this.$http.adornData(ids, false)
         }).then(({ data }) => {
+          console.log(data);
           if (data && data.code === 0) {
             this.$message({
               message: "操作成功",

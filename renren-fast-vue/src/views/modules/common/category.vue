@@ -1,15 +1,8 @@
 <template>
   <div>
     <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-    <el-tree
-      :data="menus"
-      :props="defaultProps"
-      node-key="catId"
-      ref="menuTree"
-      @node-click="nodeclick"
-      :filter-node-method="filterNode"
-      :highlight-current = "true"
-    ></el-tree>
+    <el-tree :data="menus" :props="defaultProps" node-key="catId" ref="menuTree" @node-click="nodeclick"
+      :filter-node-method="filterNode" :highlight-current="true"></el-tree>
   </div>
 </template>
 
@@ -53,7 +46,12 @@ export default {
         url: this.$http.adornUrl("/product/category/list/tree"),
         method: "get"
       }).then(({ data }) => {
+        console.log(data);
         this.menus = data.data;
+      }).catch((error) => {
+        console.error(error);
+        const msg = (error && error.response && error.response.data && error.response.data.msg) || (error && error.message) || "请求失败";
+        this.$message.error(msg);
       });
     },
     nodeclick(data, node, component) {
@@ -67,16 +65,14 @@ export default {
     this.getMenus();
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-  beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+  mounted() { },
+  beforeCreate() { }, //生命周期 - 创建之前
+  beforeMount() { }, //生命周期 - 挂载之前
+  beforeUpdate() { }, //生命周期 - 更新之前
+  updated() { }, //生命周期 - 更新之后
+  beforeDestroy() { }, //生命周期 - 销毁之前
+  destroyed() { }, //生命周期 - 销毁完成
+  activated() { } //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>
