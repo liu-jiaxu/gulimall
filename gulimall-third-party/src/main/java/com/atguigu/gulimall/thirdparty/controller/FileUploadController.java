@@ -30,12 +30,13 @@ public class FileUploadController {
      * <p>
      * <a href="http://localhost:30000/admin/system/minio/uploadUrl?fileName=test.png&bucketPackageName=test">http://localhost:30000/admin/system/minio/uploadUrl?fileName=test.png&bucketPackageName=test</a>
      * @param fileName 原始文件名
-     * @param bucketPackageName bucket 包名（用于区分不同业务模块的文件存储目录）
+     * @param bucketPackageName bucket 包名（用于区分不同业务模块的文件存储目录），可不传，缺省使用 default
      * @return uploadUrl —— PUT 直传地址（短时 10 分钟）
      *         fileUrl   —— GET 可访问地址（7 天，前端存它用于图片展示）
      */
     @PostMapping("/uploadUrl")
-    public R getUploadUrl(@RequestParam("fileName") String fileName, @RequestParam("bucketPackageName") String bucketPackageName) {
+    public R getUploadUrl(@RequestParam("fileName") String fileName,
+                          @RequestParam(value = "bucketPackageName", required = false) String bucketPackageName) {
         try {
             Map<String, String> urls = fileUploadService.getUploadUrl(fileName, bucketPackageName);
             return R.ok()

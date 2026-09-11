@@ -32,7 +32,12 @@ export default {
   name: 'singleUpload',
   props: {
     value: String,
-    type: String
+    // 上传到 MinIO 桶时使用的目录名（由调用方指定）。
+    // 后端 @RequestParam("bucketPackageName") 为必填，默认值可避免漏传时返回 400 Bad Request。
+    type: {
+      type: String,
+      default: 'default'
+    }
   },
   computed: {
     imageUrl() {
@@ -129,13 +134,14 @@ export default {
       const file = option.file;
       try {
         /** 请求后端签发 presigned PUT URL（该接口同时返回用于回显的 GET URL） */
-        console.log('singleUpload.httpRequest - request presigned url', { fileName: file.name, bucketPackageName: this.type })
+        const bucketPackageName = this.type || 'default';
+        console.log('singleUpload.httpRequest - request presigned url', { fileName: file.name, bucketPackageName })
         const res = await this.$http({
           url: this.$http.adornUrl('/thirdparty/admin/system/minio/uploadUrl'),
           method: 'post',
           params: {
-            fileName: file.name,   // 后端 @RequestParam("fileName")
-            bucketPackageName: this.type   // 上传到 MinIO 桶的包名
+            fileName: file.name,         // 后端 @RequestParam("fileName")
+            bucketPackageName             // 上传到 MinIO 桶的目录名（不可为 undefined）
           }
         });
         const data = res.data || {};

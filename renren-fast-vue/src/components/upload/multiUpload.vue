@@ -34,7 +34,13 @@ export default {
       type: Number,
       default: 30
     },
-    type: String // 上传到 MinIO 桶时使用的包名（由调用方指定）
+    // 上传到 MinIO 桶时使用的目录名（由调用方指定）。
+    // 必须保证有值：后端 @RequestParam("bucketPackageName") 为必填，
+    // 若为 undefined，axios 会丢弃该 query 参数，后端将返回 400 Bad Request。
+    type: {
+      type: String,
+      default: 'default'
+    }
   },
   data() {
     return {
@@ -125,11 +131,12 @@ export default {
       const file = option.file;
       try {
         /** 请求后端签发 presigned PUT URL（每张图片单独签名） */
-        console.log('multiUpload.httpRequest - request presigned url', { fileName: file.name, bucketPackageName: this.type })
+        const bucketPackageName = this.type || 'default';
+        console.log('multiUpload.httpRequest - request presigned url', { fileName: file.name, bucketPackageName })
         const res = await this.$http({
           url: this.$http.adornUrl('/thirdparty/admin/system/minio/uploadUrl'),
           method: 'post',
-          params: { fileName: file.name, bucketPackageName: this.type }
+          params: { fileName: file.name, bucketPackageName }
         });
         const data = res.data || {};
         console.log('multiUpload.httpRequest - presigned response', data)
