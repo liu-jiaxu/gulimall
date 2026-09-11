@@ -49,7 +49,7 @@ export default {
     },
     paths(v) {
       this.$emit("update:catelogPath", v);
-      //可选：通过 pubsub-js 广播；本项目未安装/注册 PubSub，判空避免 watcher 中断
+      //通过 pubsub-js 广播；PubSub 已在 main.js 全局注册，判空仅为容错
       if (this.PubSub && this.PubSub.publish) {
         this.PubSub.publish("catPath", v);
       }
