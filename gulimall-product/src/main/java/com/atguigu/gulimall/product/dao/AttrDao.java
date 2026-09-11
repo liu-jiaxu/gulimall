@@ -27,4 +27,6 @@ public interface AttrDao extends BaseMapper<AttrEntity> {
     IPage<AttrEntity> selectNoRelationAttr(IPage<AttrEntity> page,
                                            @Param("attrGroupId") Long attrGroupId,
                                            @Param("key") String key);
+
+    String getAttrNameById(@Param("attrId") Long attrId);
 }

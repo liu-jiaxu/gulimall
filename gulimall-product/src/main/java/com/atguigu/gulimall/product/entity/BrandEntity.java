@@ -1,9 +1,9 @@
 package com.atguigu.gulimall.product.entity;
 
-import com.atguigu.common.valid.AddGroup;
-import com.atguigu.common.valid.showStatusValid.ListValue;
-import com.atguigu.common.valid.UpdateGroup;
-import com.atguigu.common.valid.UpdateGroupStatus;
+import com.atguigu.gulimall.common.valid.AddGroup;
+import com.atguigu.gulimall.common.valid.showStatusValid.ListValue;
+import com.atguigu.gulimall.common.valid.UpdateGroup;
+import com.atguigu.gulimall.common.valid.UpdateGroupStatus;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import jakarta.validation.constraints.*;

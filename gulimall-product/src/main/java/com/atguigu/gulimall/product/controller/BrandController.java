@@ -3,9 +3,9 @@ package com.atguigu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.atguigu.common.valid.AddGroup;
-import com.atguigu.common.valid.UpdateGroup;
-import com.atguigu.common.valid.UpdateGroupStatus;
+import com.atguigu.gulimall.common.valid.AddGroup;
+import com.atguigu.gulimall.common.valid.UpdateGroup;
+import com.atguigu.gulimall.common.valid.UpdateGroupStatus;
 import jakarta.validation.Valid;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.service.BrandService;
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.common.utils.PageUtils;
+import com.atguigu.gulimall.common.utils.R;
 
 
 

@@ -1,7 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.common.utils.PageUtils;
+import com.atguigu.gulimall.common.utils.Query;
 import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;

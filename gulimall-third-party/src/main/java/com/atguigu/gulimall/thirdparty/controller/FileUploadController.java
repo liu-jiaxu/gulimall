@@ -1,6 +1,6 @@
 package com.atguigu.gulimall.thirdparty.controller;
 
-import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.common.utils.R;
 import com.atguigu.gulimall.thirdparty.service.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

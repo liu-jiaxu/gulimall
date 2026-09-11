@@ -1,8 +1,8 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import com.atguigu.common.enums.product.AttrEnum;
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.common.enums.product.AttrEnum;
+import com.atguigu.gulimall.common.utils.PageUtils;
+import com.atguigu.gulimall.common.utils.Query;
 import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gulimall.product.dao.AttrDao;
 import com.atguigu.gulimall.product.dao.AttrGroupDao;
@@ -11,6 +11,7 @@ import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.method.AttrMethod;
 import com.atguigu.gulimall.product.method.CategoryMethod;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
@@ -44,6 +45,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     private CategoryDao categoryDao;
     @Autowired
     private CategoryMethod categoryMethod;
+    @Autowired
+    private AttrMethod attrMethod;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -185,20 +188,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
      */
     @Override
     public List<AttrEntity> getRelationAttr(Long attrgroupId) {
-        // 1、查询该分组下的所有关联记录
-        List<AttrAttrgroupRelationEntity> relationEntities = attrAttrgroupRelationDao.selectList(
-                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrgroupId));
-
-        // 2、取出关联的属性 id 集合
-        List<Long> attrIds = relationEntities.stream()
-                .map(AttrAttrgroupRelationEntity::getAttrId)
-                .collect(Collectors.toList());
-
-        // 3、按 id 批量查询属性详情（空集合会查空，直接返回）
-        if (attrIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return this.baseMapper.selectByIds(attrIds);
+        return attrMethod.getRelationAttr(attrgroupId);
     }
 
     /**

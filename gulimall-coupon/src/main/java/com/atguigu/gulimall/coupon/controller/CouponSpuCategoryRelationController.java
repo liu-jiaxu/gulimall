@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atguigu.gulimall.coupon.entity.CouponSpuCategoryRelationEntity;
 import com.atguigu.gulimall.coupon.service.CouponSpuCategoryRelationService;
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.common.utils.PageUtils;
+import com.atguigu.gulimall.common.utils.R;
 
 
 

@@ -1,7 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.common.utils.PageUtils;
+import com.atguigu.gulimall.common.utils.Query;
 import com.atguigu.gulimall.product.dao.BrandDao;
 import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
@@ -16,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 
 @Service("categoryBrandRelationService")
@@ -67,6 +70,15 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         BrandEntity brandEntity = brandDao.selectById(categoryBrandRelation.getBrandId());
         log.info("brandEntity: {}", brandEntity);
         categoryBrandRelation.setBrandName(brandEntity.getName());
+    }
+
+    // 获取分类关联的品牌
+    @Override
+    public List<BrandEntity> getBrandsByCatId(Long catId) {
+        List<CategoryBrandRelationEntity> categoryBrandRelationEntities =
+                this.list(new QueryWrapper<CategoryBrandRelationEntity>().eq("catelog_id", catId));
+        return categoryBrandRelationEntities.stream()
+                .map(entity -> brandDao.selectById(entity.getBrandId())).toList();
     }
 
 }

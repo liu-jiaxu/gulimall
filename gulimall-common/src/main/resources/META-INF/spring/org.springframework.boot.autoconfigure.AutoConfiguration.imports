@@ -1,1 +1,2 @@
-com.atguigu.common.config.ShiroConfig
+com.atguigu.gulimall.common.config.ShiroConfig
+com.atguigu.gulimall.common.aspect.ControllerLogAutoConfiguration

@@ -1,7 +1,7 @@
 package com.atguigu.gulimall.product.exception;
 
-import com.atguigu.common.enums.BizCodeEnum;
-import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.common.enums.BizCodeEnum;
+import com.atguigu.gulimall.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;

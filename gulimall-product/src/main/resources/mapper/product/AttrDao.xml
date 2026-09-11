@@ -37,4 +37,10 @@
         </if>
     </select>
 
+	<select id="getAttrNameById" resultType="java.lang.String">
+        SELECT a.attr_name
+        FROM pms_attr a
+        WHERE a.attr_id = #{attrId}
+	</select>
+
 </mapper>

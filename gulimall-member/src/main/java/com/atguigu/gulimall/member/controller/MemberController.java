@@ -3,7 +3,7 @@ package com.atguigu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.atguigu.gulimall.member.feign.CouponFeignService;
+import com.atguigu.gulimall.member.feign.CouponFeignClient;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atguigu.gulimall.member.entity.MemberEntity;
 import com.atguigu.gulimall.member.service.MemberService;
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.common.utils.PageUtils;
+import com.atguigu.gulimall.common.utils.R;
 
 
 
@@ -33,7 +33,7 @@ public class MemberController {
     private MemberService memberService;
 
     @Autowired
-    private CouponFeignService couponFeignService;
+    private CouponFeignClient couponFeignClient;
 
     /**
      * 获取当前会员的优惠券列表
@@ -48,9 +48,10 @@ public class MemberController {
      */
     @RequestMapping("/coupon/list")
     public R getCouponList() {
+        // 实际业务和远程调用最好下沉到service层实装
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setNickname("张三");
-        R memberCoupons = couponFeignService.memberCoupons();
+        R memberCoupons = couponFeignClient.memberCoupons();
         return R.ok().put("member", memberEntity).put("coupons", memberCoupons.get("coupons"));
     }
 
