@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.ware.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -54,12 +56,14 @@ public class PurchaseEntity implements Serializable {
 	 */
 	private BigDecimal amount;
 	/**
-	 * 
+	 * 创建日期：插入时由 MyMetaObjectHandler 自动填充
 	 */
+	@TableField(fill = FieldFill.INSERT)
 	private Date createTime;
 	/**
-	 * 
+	 * 更新日期：插入和更新时由 MyMetaObjectHandler 自动填充
 	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private Date updateTime;
 
 }

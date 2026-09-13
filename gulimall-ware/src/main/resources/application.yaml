@@ -42,6 +42,13 @@ spring:
       # 指定data-id
       - optional:nacos:gulimall.yaml
 
+  # 项目返回日期统一格式化
+  # time-zone 必须写：Jackson 默认用 UTC 序列化 Date，
+  # 只配 date-format 的话返回的时间会比北京时间少 8 小时
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
 mybatis-plus:
   # classpath*表示自己和引入其他模块的mapper.xml都会扫描
   mapper-locations: classpath*:/mapper/**/*.xml
@@ -53,3 +60,7 @@ mybatis-plus:
 #      logic-not-delete-value: 0        # 逻辑未删除值
 #      table-prefix: wms_               # 表名前缀（可选）
 #      field-strategy: not_null         # 字段策略：非空才更新
+
+logging:
+  level:
+    com.atguigu.gulimall: debug

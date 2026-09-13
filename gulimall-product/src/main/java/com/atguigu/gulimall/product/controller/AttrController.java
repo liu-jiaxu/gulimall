@@ -30,6 +30,9 @@ public class AttrController {
     @Autowired
     private AttrService attrService;
 
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
+
     // product/attr/sale/list/0?
     // product/attr/base/list/{catelogId}
     @GetMapping("/{attrType}/list/{catelogId}")
@@ -39,6 +42,27 @@ public class AttrController {
 
         PageUtils page = attrService.queryBaseAttrPage(params, catelogId, type);
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取 spu 的规格
+     */
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseListforspu(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity> entityList = productAttrValueService.baseAttrlistForSpu(spuId);
+
+        return R.ok().put("data", entityList);
+    }
+
+    /**
+     * 修改 spu 的规格
+     */
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId,
+                           @RequestBody List<ProductAttrValueEntity> entities) {
+        productAttrValueService.updateSpuAttr(spuId, entities);
+
+        return R.ok();
     }
 
     /**
