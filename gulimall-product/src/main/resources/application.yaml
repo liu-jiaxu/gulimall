@@ -42,6 +42,10 @@ spring:
       # 指定data-id
       - optional:nacos:gulimall.yaml
 
+  # 项目返回日期统一格式化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+
 mybatis-plus:
   # classpath*表示自己和引入其他模块的mapper.xml都会扫描
   mapper-locations: classpath*:/mapper/**/*.xml
@@ -54,3 +58,7 @@ mybatis-plus:
       logic-not-delete-value: 0        # 逻辑未删除值
 #      table-prefix: pms_               # 表名前缀（可选）
 #      field-strategy: not_null         # 字段策略：非空才更新
+
+logging:
+  level:
+    com.atguigu.gulimall: debug

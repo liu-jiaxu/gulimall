@@ -1,4 +1,4 @@
-package com.atguigu.gulimall;
+package com.atguigu.gulimall.common;
 
 public class CommonTest {
 

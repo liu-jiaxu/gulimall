@@ -14,7 +14,7 @@ import com.atguigu.gulimall.product.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mysql.cj.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import lombok.Builder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -155,7 +155,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     return skuImagesEntity;
                 }).filter(entity -> {
                     //返回true是需要，返回false是过滤掉
-                    return !StringUtils.isNullOrEmpty(entity.getImgUrl());
+                    return StringUtils.isNotEmpty(entity.getImgUrl());
                 }).collect(Collectors.toList());
                 skuImagesService.saveBatch(skuImagesEntities);
 
@@ -182,6 +182,35 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 }
             });
         }
+    }
+
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        // status=0, key=6, brandId=1, catelogId=225
+        QueryWrapper<SpuInfoEntity> queryWrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        if (StringUtils.isNotEmpty(key)) {
+            queryWrapper.and(w -> w.eq("id", key).or().like("spu_name", key));
+        }
+        String catelogId = (String) params.get("catelogId");
+        if (!StringUtils.isNotEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)){
+            queryWrapper.eq("catalog_id", catelogId);
+        }
+
+        String brandId = (String) params.get("brandId");
+        if (StringUtils.isNotEmpty(brandId) && !"0".equalsIgnoreCase(brandId)){
+            queryWrapper.eq("brand_id", brandId);
+        }
+
+        String status = (String) params.get("status");
+        if (StringUtils.isNotEmpty(status)){
+            queryWrapper.eq("publish_status", status);
+        }
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
     }
 
 }
