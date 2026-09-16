@@ -132,6 +132,16 @@ export default {
   methods: {
     addCatelogSelect() {
       //{"brandId":1,"catelogId":2}
+      //未选择分类时 catelogPath 为空数组，直接取下标会得到 undefined，
+      //既会污染其他页面（PubSub 广播），也会向后端写入 catelogId 为空的脏数据
+      if (!this.brandId) {
+        this.$message.warning('未获取到品牌信息，请重新打开弹窗');
+        return;
+      }
+      if (!this.catelogPath || this.catelogPath.length === 0) {
+        this.$message.warning('请先选择要关联的分类');
+        return;
+      }
       this.popCatelogSelectVisible = false;
       this.$http({
         url: this.$http.adornUrl("/product/categorybrandrelation/save"),

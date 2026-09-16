@@ -167,7 +167,8 @@ export default {
   },
   mounted() {
     this.catPathSub = PubSub.subscribe("catPath", (msg, val) => {
-      this.dataForm.catelogId = val[val.length - 1];
+      //val 可能为空数组（清空选择），此时回落到 0，避免把 undefined 传进筛选条件
+      this.dataForm.catelogId = val && val.length > 0 ? val[val.length - 1] : 0;
     });
     this.brandIdSub = PubSub.subscribe("brandId", (msg, val) => {
       this.dataForm.brandId = val;

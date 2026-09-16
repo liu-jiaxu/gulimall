@@ -59,9 +59,16 @@ export default {
   created() { },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    //监听三级分类消息的变化
+    //监听三级分类消息的变化（PubSub 是全局的，其他页面的级联选择同样会广播到这里）
     this.subscribe = PubSub.subscribe("catPath", (msg, val) => {
-      this.catId = val[val.length - 1];
+      //未选中或清空选择时 val 为空数组，此时取下标会得到 undefined，
+      //请求会被 lodash.merge 丢掉 catId 参数，后端报 MissingServletRequestParameterException
+      this.catId = val && val.length > 0 ? val[val.length - 1] : 0;
+      if (!this.catId) {
+        this.brands = [];
+        this.brandId = "";
+        return;
+      }
       this.getCatBrands();
     });
   },
@@ -76,5 +83,5 @@ export default {
   activated() { } //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
-<style scoped>
+<style scoped>
 </style>

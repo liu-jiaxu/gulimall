@@ -66,10 +66,21 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     public void saveDetails(CategoryBrandRelationEntity categoryBrandRelation) {
         CategoryEntity categoryEntity = categoryDao.selectById(categoryBrandRelation.getCatelogId());
         log.info("categoryEntity: {}", categoryEntity);
+        if (categoryEntity == null) {
+            throw new IllegalArgumentException("保存品牌分类关联失败：分类不存在，catelogId="
+                    + categoryBrandRelation.getCatelogId());
+        }
         categoryBrandRelation.setCatelogName(categoryEntity.getName());
+
         BrandEntity brandEntity = brandDao.selectById(categoryBrandRelation.getBrandId());
         log.info("brandEntity: {}", brandEntity);
+        if (brandEntity == null) {
+            throw new IllegalArgumentException("保存品牌分类关联失败：品牌不存在，brandId="
+                    + categoryBrandRelation.getBrandId());
+        }
         categoryBrandRelation.setBrandName(brandEntity.getName());
+
+        this.save(categoryBrandRelation);
     }
 
     // 获取分类关联的品牌

@@ -65,31 +65,32 @@ export default {
   methods: {
     searchSpuInfo() {
       console.log("搜索条件", this.dataForm);
-      this.PubSub.publish("dataForm",this.dataForm);
+      this.PubSub.publish("dataForm", this.dataForm);
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() { },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     this.catPathSub = PubSub.subscribe("catPath", (msg, val) => {
-      this.dataForm.catelogId = val[val.length-1];
+      //val 可能为空数组（清空选择），此时回落到 0，避免把 undefined 传进筛选条件
+      this.dataForm.catelogId = val && val.length > 0 ? val[val.length - 1] : 0;
     });
     this.brandIdSub = PubSub.subscribe("brandId", (msg, val) => {
       this.dataForm.brandId = val;
     });
   },
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
+  beforeCreate() { }, //生命周期 - 创建之前
+  beforeMount() { }, //生命周期 - 挂载之前
+  beforeUpdate() { }, //生命周期 - 更新之前
+  updated() { }, //生命周期 - 更新之后
   beforeDestroy() {
-     PubSub.unsubscribe(this.catPathSub); 
-     PubSub.unsubscribe(this.brandIdSub); 
+    PubSub.unsubscribe(this.catPathSub);
+    PubSub.unsubscribe(this.brandIdSub);
   }, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+  destroyed() { }, //生命周期 - 销毁完成
+  activated() { } //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
-<style scoped>
+<style scoped>
 </style>
