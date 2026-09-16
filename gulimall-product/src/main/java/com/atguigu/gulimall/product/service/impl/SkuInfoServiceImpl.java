@@ -37,7 +37,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         }
         String catelogId = (String) params.get("catelogId");
         if (!StringUtils.isNotEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)){
-            queryWrapper.eq("catalog_id", catelogId);
+            queryWrapper.eq("catelog_id", catelogId);
         }
 
         String brandId = (String) params.get("brandId");
