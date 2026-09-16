@@ -193,7 +193,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             queryWrapper.and(w -> w.eq("id", key).or().like("spu_name", key));
         }
         String catelogId = (String) params.get("catelogId");
-        if (!StringUtils.isNotEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)){
+        if (StringUtils.isNotEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)){
             queryWrapper.eq("catelog_id", catelogId);
         }
 
