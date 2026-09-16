@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.gulimall.product.method.ProductAttrValueMethod;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -20,6 +22,9 @@ import com.atguigu.gulimall.product.service.ProductAttrValueService;
 @Service("productAttrValueService")
 public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao, ProductAttrValueEntity> implements ProductAttrValueService {
 
+    @Autowired
+    private ProductAttrValueMethod productAttrValueMethod;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<ProductAttrValueEntity> page = this.page(
@@ -31,9 +36,8 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
     }
 
     @Override
-    public List<ProductAttrValueEntity> baseAttrlistForSpu(Long spuId) {
-        return this.baseMapper.selectList(
-                new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+    public List<ProductAttrValueEntity> baseAttrListForSpu(Long spuId) {
+        return productAttrValueMethod.baseAttrListForSpu(spuId);
     }
 
     /**

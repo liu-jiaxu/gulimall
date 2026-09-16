@@ -48,8 +48,8 @@ public class AttrController {
      * 获取 spu 的规格
      */
     @GetMapping("/base/listforspu/{spuId}")
-    public R baseListforspu(@PathVariable("spuId") Long spuId) {
-        List<ProductAttrValueEntity> entityList = productAttrValueService.baseAttrlistForSpu(spuId);
+    public R baseListForSpu(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity> entityList = productAttrValueService.baseAttrListForSpu(spuId);
 
         return R.ok().put("data", entityList);
     }

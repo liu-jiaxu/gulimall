@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.gulimall.common.utils.PageUtils;
 import com.atguigu.gulimall.ware.entity.WareSkuEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,5 +27,7 @@ public interface WareSkuService extends IService<WareSkuEntity> {
      * @param skuNum  本次入库数量
      */
     void addStock(Long skuId, Long wareId, String skuName, Integer skuNum);
+
+    Map<Long, Boolean> getSkuHasStock(List<Long> skuIds);
 }
 

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 商品属性
  *
@@ -29,4 +31,11 @@ public interface AttrDao extends BaseMapper<AttrEntity> {
                                            @Param("key") String key);
 
     String getAttrNameById(@Param("attrId") Long attrId);
+
+    /**
+     * 根据attrId查询当前attr是否可被检索
+     * @param attrIds
+     * @return
+     */
+    List<Long> selectSearchAttrs(@Param("attrIds") List<Long> attrIds);
 }

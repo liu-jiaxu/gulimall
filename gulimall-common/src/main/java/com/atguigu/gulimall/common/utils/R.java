@@ -8,6 +8,7 @@
 
 package com.atguigu.gulimall.common.utils;
 
+import lombok.Data;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -65,4 +66,33 @@ public class R extends HashMap<String, Object> {
 	public Integer getCode(){
 		return (Integer) this.get("code");
 	}
+}
+
+// 更推荐这种返回结果
+@Data
+class Result<T> {
+
+	//返回码
+	private Integer code;
+
+	//返回消息
+	private String message;
+
+	//返回数据
+	private T data;
+
+	// 私有化构造
+	private Result() {}
+
+	// 返回数据
+	public static <T> Result<T> build(T body, Integer code, String message) {
+		Result<T> result = new Result<>();
+		result.setData(body);
+		result.setCode(code);
+		result.setMessage(message);
+		return result;
+	}
+	// Result<T>.build(...);
+	// save/update方法泛型就写Void
+
 }

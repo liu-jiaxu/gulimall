@@ -30,6 +30,8 @@ public enum BizCodeEnum {
 
     VALID_EXCEPTION( 10001,"参数格式校验失败"),
 
+    PRODUCT_UP_EXCEPTION(11000, "商品上架异常"),
+
     SAME_RECORD_EXCEPTION(20001,"已存在相同的品牌和分类记录");
 
     private final int code;
