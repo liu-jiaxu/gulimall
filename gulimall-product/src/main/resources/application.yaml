@@ -49,6 +49,10 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 
+  thymeleaf:
+    # 关闭缓存
+    cache: false
+
 mybatis-plus:
   # classpath*表示自己和引入其他模块的mapper.xml都会扫描
   mapper-locations: classpath*:/mapper/**/*.xml

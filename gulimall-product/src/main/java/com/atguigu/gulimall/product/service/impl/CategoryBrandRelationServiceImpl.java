@@ -80,6 +80,8 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         }
         categoryBrandRelation.setBrandName(brandEntity.getName());
 
+        // 关键修复：原实现只补全了名称字段，没有真正写库，
+        // 导致接口返回成功但 pms_category_brand_relation 表里查不到新记录
         this.save(categoryBrandRelation);
     }
 
