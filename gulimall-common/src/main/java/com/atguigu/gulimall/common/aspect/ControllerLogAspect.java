@@ -26,10 +26,15 @@ import java.util.Arrays;
 public class ControllerLogAspect {
 
     /**
-     * 切点：com.atguigu 下任意层级中名为 controller 的包及其子包中的所有方法
-     * （覆盖 product / coupon / member / order / ware / thirdparty 等模块）
+     * 切点：com.atguigu 下任意层级中，以下两类包及其子包里的所有方法（两者【并列】）：
+     * <ul>
+     *     <li>名为 {@code controller} 的包 —— 后台 CRUD 控制器，
+     *         覆盖 product / coupon / member / order / ware / search / third-party 等模块</li>
+     *     <li>名为 {@code web} 的包 —— 面向页面的控制器，
+     *         如 {@code com.atguigu.gulimall.product.web.IndexController}（Thymeleaf 页面 + 页面 AJAX 接口）</li>
+     * </ul>
      */
-    @Pointcut("execution(* com.atguigu..controller..*(..))")
+    @Pointcut("execution(* com.atguigu..controller..*(..)) || execution(* com.atguigu..web..*(..))")
     public void controllerPointcut() {
     }
 
