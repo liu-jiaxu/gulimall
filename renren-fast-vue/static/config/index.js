@@ -5,8 +5,12 @@
   window.SITE_CONFIG = {};
 
   // api接口请求地址
+  // 【旧】直连 renren-fast
   // window.SITE_CONFIG['baseUrl'] = 'http://localhost:8080/renren-fast';
-  window.SITE_CONFIG['baseUrl'] = 'http://localhost:88/gulimall';
+  // 【旧】本地开发直连网关
+  // window.SITE_CONFIG['baseUrl'] = 'http://localhost:88/gulimall';
+  // 【新】走 Nginx 统一入口（admin.gulimall.com）
+  window.SITE_CONFIG['baseUrl'] = 'http://admin.gulimall.com/gulimall';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain'] = './'; // 域名
