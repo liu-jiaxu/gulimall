@@ -8,6 +8,15 @@
 
 本地环境一共三条链路：**页面/接口**、**图片**、**后端服务间调用**。前两条来自浏览器，第三条只在服务器内部发生。
 
+其中**页面有两个来源**，Nginx 按域名区分：
+
+| 入口域名 | 页面由谁提供 | 前端类型 |
+|---|---|---|
+| `gulimall.com` | `gulimall-product` | **Thymeleaf**，服务端现场渲染 HTML |
+| `admin.gulimall.com` | Nginx 直接返回磁盘文件 | **Vue 静态 dist**（`renren-fast-vue` 构建产物） |
+
+这个区别决定了 Nginx 里 `location /` 怎么写：前者用 `proxy_pass`，后者用 `root` + `try_files`。
+
 ### 1. 页面 / 接口访问
 
 ```
@@ -25,7 +34,8 @@ Linux 虚拟机
   ↓
 Nginx
   │
-  ├── ④ location /            → 返回 Vue 前端静态资源（index.html / js / css）
+  ├── ④ location /            → 反向代理到 gulimall-product :10000
+  │                              （客户端页面是 Thymeleaf，由 product 现场渲染出 HTML）
   │
   └── ⑤ location /gulimall/   → 转发给 Gateway :88
                                     │
@@ -46,14 +56,53 @@ Nginx
 | ① | 浏览器发起请求 | 用户操作 |
 | ② | **hosts 把域名解析到 IP** | `gulimall.com` 是真实注册的公网域名，不配 hosts 会解析到公网那台服务器。配了才能指向我们自己的机器 |
 | ③ | 请求到达虚拟机的 **80 端口** | Nginx 是**唯一对外暴露**的端口 |
-| ④ / ⑤ | Nginx 按 **路径** 分流 | `/` 是前端页面，`/gulimall/**` 是后端接口 —— 同一个域名、同一个端口，靠路径区分 |
+| ④ / ⑤ | Nginx 按 **路径** 分流 | `/` 是客户端页面，`/gulimall/**` 是后端接口 —— 同一个域名、同一个端口，靠路径区分 |
+| ④ | `/` 转发给 **`gulimall-product:10000`** | 客户端页面是 **Thymeleaf 现场渲染**的（页面文件在 product 里，不是磁盘上的静态 HTML），必须由 product 生成 HTML 再返回 |
 | ⑤ | Gateway 收到 `/gulimall/order/**` | 网关的路由配置写的是 `uri: lb://gulimall-order`，**只写服务名，不写 IP** |
 | — | Gateway 向 **Nacos** 查询 `gulimall-order` 的实例列表 | 拿到当前可用的 `IP:端口` 清单（可能有多个实例） |
 | — | Gateway 转发到选中的实例 | 负载均衡（`lb` = LoadBalancer） |
 
+> **④ 这里是 `proxy_pass` 而不是 `root`**，区别很关键：
+>
+> | 前端类型 | 页面文件在哪 | Nginx 怎么配 |
+> |---|---|---|
+> | **Thymeleaf**（本项目客户端） | product 的 `templates/`，**打包在服务里** | `proxy_pass` 转给 product 渲染 |
+> | **静态 Vue dist**（如管理端） | 磁盘上的 `html/admin/` | `root` + `try_files`，Nginx 直接返回文件 |
+>
+> 配错了的典型症状：Nginx 去磁盘找 `index.html`，找不到就报
+> `open() "/usr/share/nginx/html/index.html" failed (2: No such file or directory)`，最终返回 **403**。
+
 > **关键点：从 Gateway 到微服务这一段，地址是"查出来的"，不是"写死的"。**
 > 微服务启动时把自己的 `IP:端口` 注册到 Nacos，Gateway 只认服务名。
 > 所以微服务扩容、迁移、换端口，**Gateway 的配置一个字都不用改** —— 这就是注册中心存在的意义。
+
+**管理端（`admin.gulimall.com`）的链路完全同理**，只有 `location /` 那一步不同：
+
+```
+浏览器
+  │
+  │ ① http://admin.gulimall.com
+  ↓
+Windows hosts
+  │
+  │ ② admin.gulimall.com → 192.168.10.200
+  ↓
+Linux 虚拟机
+  │
+  │ ③ 到达 Nginx :80
+  ↓
+Nginx
+  │
+  ├── ④ location /            → 直接返回磁盘上的 html/admin/（Vue 静态文件）
+  │                              try_files 做 history 回退，刷新子路由不 404
+  │
+  └── ⑤ location /gulimall/   → 转发给 Gateway :88（业务接口 + renren-fast 自身的接口）
+```
+
+> 管理端的接口**全部走网关**（包括 renren-fast 自己的 `/sys/*` 接口）——
+> 网关里有条 `admin_route` 兜底路由（`Path=/gulimall/**`，order 99），
+> 会把没被业务路由匹配的路径重写成 `/renren-fast/*` 转给后台服务。
+> 所以管理端前端只需要配**一个** `baseUrl`（`http://admin.gulimall.com/gulimall`）就够了。
 
 ### 2. 图片访问
 
@@ -120,12 +169,24 @@ gulimall.com
 192.168.10.200:80
       ↓
     Nginx
+      │
+      ├── /                → gulimall-product :10000（Thymeleaf 现场渲染页面）
+      │
+      └── /gulimall/**     → Gateway :88
+                                ↓
+                              Nacos
+                                ↓
+                        具体微服务（私有IP:端口）
+
+admin.gulimall.com
       ↓
-  Gateway:88
+192.168.10.200:80
       ↓
-    Nacos
-      ↓
-具体微服务（私有IP:端口）
+    Nginx
+      │
+      ├── /                → 磁盘静态文件 html/admin/（Vue dist）
+      │
+      └── /gulimall/**     → Gateway :88（所有接口，含 renren-fast 自身的）
 
 img.gulimall.com
       ↓
@@ -136,15 +197,18 @@ img.gulimall.com
     MinIO
 ```
 
-**注意两个域名最终都落在 `192.168.10.200:80`** —— 也就是同一个 Nginx 进程。
+**三个域名最终都落在 `192.168.10.200:80`** —— 同一个 Nginx 进程。
 区分它们的是 HTTP 请求头里的 **`Host`**，Nginx 用 `server_name` 匹配：
 
 | 请求的域名 | 命中的 server 块 | 走哪条链路 |
 |---|---|---|
-| `gulimall.com` | `server_name gulimall.com;` | 前端静态资源 / Gateway |
+| `gulimall.com` | `server_name gulimall.com;` | `/` → product；`/gulimall/**` → Gateway |
+| `admin.gulimall.com` | `server_name admin.gulimall.com;` | `/` → 静态 `html/admin/`；`/gulimall/**` → Gateway |
 | `img.gulimall.com` | `server_name img.gulimall.com;` | MinIO |
 
-这也是**为什么必须用域名、不能直接用 IP**：用 IP 访问时 `Host` 头里是 IP，两个 `server_name` 都不匹配，图片站点永远命中不到。
+这也是**为什么必须用域名、不能直接用 IP**：用 IP 访问时 `Host` 头里是 IP，三个 `server_name` 都不匹配，
+请求会落到**第一个 server 块**（即 `gulimall.com`）。所以主站"看起来能用"，
+但**管理端和图片站永远访问不到** —— 它们完全依赖 `Host` 匹配。
 
 ### 5. 各服务端口一览（对外 vs 仅内网）
 
@@ -152,7 +216,8 @@ img.gulimall.com
 |---|---|---|
 | **Nginx** | 80 | ✅ **唯一对外的入口** |
 | Gateway | 88 | ❌ 只给 Nginx 转发，直接访问没有意义 |
-| 各微服务 | 10000+ | ❌ 私有端口，由 Gateway 通过 Nacos 发现 |
+| **gulimall-product** | **10000** | ❌ 被访问两次：① Nginx 走 `/` 直接反代它（客户端页面）；② 走 `/gulimall/product/**` 经网关调它的接口 |
+| 其余微服务 | 7000 / 8000 / 9000 / 11000 / 12000 / 30000 | ❌ 私有端口，只由 Gateway 通过 Nacos 发现 |
 | Nacos | 8848 / 8849 | ⚠️ 控制台直连（本地环境方便，生产不对外） |
 | MinIO | 19000 / 19001 | ⚠️ 19000 供程序上传，19001 是控制台 |
 | MySQL / Redis / ES / Kibana | 3306 / 6379 / 9200 / 5601 | ⚠️ 同上 |
@@ -273,7 +338,7 @@ Nginx / SLB / ALB
 
 **Q：为什么不能直接用 `http://192.168.10.200/gulimall/product/list` 访问接口？**
 
-可以，但要理解它的含义：用 IP 访问时 `Host` 头是 `192.168.10.200`，两个 `server_name` 都匹配不上，Nginx 会把请求交给**第一个 server 块**（即 `gulimall.com` 那个）。所以功能上能用，但**图片站点永远访问不到**（它依赖 `Host: img.gulimall.com`）。这也是必须配 hosts 的原因。
+可以，但要理解它的含义：用 IP 访问时 `Host` 头是 `192.168.10.200`，三个 `server_name` 都匹配不上，Nginx 会把请求交给**第一个 server 块**（即 `gulimall.com` 那个）。所以功能上能用，但**管理端和图片站永远访问不到**（它们完全依赖 `Host: admin.gulimall.com` / `img.gulimall.com`）。这也是必须配 hosts 的原因。
 
 **Q：Gateway 为什么不能去掉，直接让 Nginx 转发到微服务？**
 
